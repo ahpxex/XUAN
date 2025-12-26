@@ -4,6 +4,10 @@ The XUAN (Chinese metaphysics) app that helps people understand themselves deepe
 
 This is a Hackathon project, so please follow the principle of MVP, don't use complicated design and let's get things straightforward.
 
+## Guideline
+
+- Don't run dev server ever.
+
 ## Project Architecture
 
 - Frontend, we use TanStack Start and React, at `src`, follow a feature based directory structure.

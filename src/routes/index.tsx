@@ -9,25 +9,25 @@ interface FormData {
 	birthYear: string;
 	birthMonth: string;
 	birthDay: string;
-	birthHour: string;
-	birthMinute: string;
-	birthPeriod: string;
+	birthShichen: string;
 }
 
-const HOURS = Array.from({ length: 12 }, (_, i) =>
-	(i + 1).toString().padStart(2, "0"),
-);
-const MINUTES = Array.from({ length: 60 }, (_, i) =>
-	i.toString().padStart(2, "0"),
-);
+const SHICHEN = [
+	{ label: "子时", value: "zi", time: "23:00-01:00" },
+	{ label: "丑时", value: "chou", time: "01:00-03:00" },
+	{ label: "寅时", value: "yin", time: "03:00-05:00" },
+	{ label: "卯时", value: "mao", time: "05:00-07:00" },
+	{ label: "辰时", value: "chen", time: "07:00-09:00" },
+	{ label: "巳时", value: "si", time: "09:00-11:00" },
+	{ label: "午时", value: "wu", time: "11:00-13:00" },
+	{ label: "未时", value: "wei", time: "13:00-15:00" },
+	{ label: "申时", value: "shen", time: "15:00-17:00" },
+	{ label: "酉时", value: "you", time: "17:00-19:00" },
+	{ label: "戌时", value: "xu", time: "19:00-21:00" },
+	{ label: "亥时", value: "hai", time: "21:00-23:00" },
+];
 const YEARS = Array.from({ length: 100 }, (_, i) =>
 	(new Date().getFullYear() - i).toString(),
-);
-const MONTHS = Array.from({ length: 12 }, (_, i) =>
-	(i + 1).toString().padStart(2, "0"),
-);
-const DAYS = Array.from({ length: 31 }, (_, i) =>
-	(i + 1).toString().padStart(2, "0"),
 );
 
 function App() {
@@ -39,9 +39,7 @@ function App() {
 		birthYear: "",
 		birthMonth: "",
 		birthDay: "",
-		birthHour: "",
-		birthMinute: "",
-		birthPeriod: "AM",
+		birthShichen: "",
 	});
 
 	const updateField = (field: keyof FormData, value: string) => {
@@ -50,17 +48,14 @@ function App() {
 
 	const canProceed = () => {
 		if (step === 1) {
-			return formData.name.trim() !== "" && formData.gender !== "";
-		}
-		if (step === 2) {
 			return (
+				formData.name.trim() !== "" &&
+				formData.gender !== "" &&
 				formData.birthYear !== "" &&
-				formData.birthMonth !== "" &&
-				formData.birthDay !== ""
+				formData.birthMonth.trim() !== "" &&
+				formData.birthDay.trim() !== "" &&
+				formData.birthShichen !== ""
 			);
-		}
-		if (step === 3) {
-			return formData.birthHour !== "" && formData.birthMinute !== "";
 		}
 		return true;
 	};
@@ -96,7 +91,7 @@ function App() {
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 01
 							</span>
-							<h2 className="text-2xl font-light">你是谁？</h2>
+							<h2 className="text-2xl font-light">基本信息</h2>
 						</div>
 
 						<div className="space-y-6">
@@ -127,7 +122,7 @@ function App() {
 											key={option.value}
 											type="button"
 											onClick={() => updateField("gender", option.value)}
-											className={`px-6 py-3 border-2 text-sm tracking-wide transition-colors ${
+											className={`flex-1 py-3 border-2 text-sm tracking-wide transition-colors ${
 												formData.gender === option.value
 													? "border-foreground bg-foreground text-background"
 													: "border-border hover:border-muted-foreground"
@@ -138,26 +133,41 @@ function App() {
 									))}
 								</div>
 							</div>
-						</div>
-					</div>
-				)}
 
-				{step === 2 && (
-					<div className="space-y-8">
-						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] text-muted-foreground">
-								步骤 02
-							</span>
-							<h2 className="text-2xl font-light">您的出生日期？</h2>
-						</div>
-
-						<div className="space-y-6">
 							<div className="space-y-3">
 								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
 									出生日期
 								</label>
-								<div className="grid grid-cols-3 gap-4">
-									<div className="space-y-1">
+								<div className="flex gap-4">
+									<div className="flex-1 flex gap-4">
+										<div className="flex-1 space-y-1">
+											<span className="text-[10px] tracking-wide text-muted-foreground/70">
+												月
+											</span>
+											<input
+												type="text"
+												value={formData.birthMonth}
+												onChange={(e) => updateField("birthMonth", e.target.value)}
+												placeholder="03"
+												maxLength={2}
+												className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm transition-colors placeholder:text-muted-foreground/50"
+											/>
+										</div>
+										<div className="flex-1 space-y-1">
+											<span className="text-[10px] tracking-wide text-muted-foreground/70">
+												日
+											</span>
+											<input
+												type="text"
+												value={formData.birthDay}
+												onChange={(e) => updateField("birthDay", e.target.value)}
+												placeholder="15"
+												maxLength={2}
+												className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm transition-colors placeholder:text-muted-foreground/50"
+											/>
+										</div>
+									</div>
+									<div className="flex-1 space-y-1">
 										<span className="text-[10px] tracking-wide text-muted-foreground/70">
 											年
 										</span>
@@ -180,51 +190,53 @@ function App() {
 											))}
 										</select>
 									</div>
-									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70">
-											月
-										</span>
-										<select
-											value={formData.birthMonth}
-											onChange={(e) =>
-												updateField("birthMonth", e.target.value)
-											}
-											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
-										>
-											<option value="" className="bg-background">
-												--
-											</option>
-											{MONTHS.map((month) => (
-												<option
-													key={month}
-													value={month}
-													className="bg-background"
-												>
-													{month}
-												</option>
-											))}
-										</select>
-									</div>
-									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70">
-											日
-										</span>
-										<select
-											value={formData.birthDay}
-											onChange={(e) => updateField("birthDay", e.target.value)}
-											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
-										>
-											<option value="" className="bg-background">
-												--
-											</option>
-											{DAYS.map((day) => (
-												<option key={day} value={day} className="bg-background">
-													{day}
-												</option>
-											))}
-										</select>
-									</div>
 								</div>
+							</div>
+
+							<div className="space-y-3">
+								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
+									出生时辰
+								</label>
+								<select
+									value={formData.birthShichen}
+									onChange={(e) => updateField("birthShichen", e.target.value)}
+									className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+								>
+									<option value="" className="bg-background">
+										--
+									</option>
+									{SHICHEN.map((shichen) => (
+										<option
+											key={shichen.value}
+											value={shichen.value}
+											className="bg-background"
+										>
+											{shichen.label} ({shichen.time})
+										</option>
+									))}
+								</select>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{step === 2 && (
+					<div className="space-y-8">
+						<div className="space-y-2">
+							<span className="text-xs tracking-[0.2em] text-muted-foreground">
+								步骤 02
+							</span>
+							<h2 className="text-2xl font-light">内容待定</h2>
+							<p className="text-sm text-muted-foreground">
+								此步骤的内容将在后续开发中完善
+							</p>
+						</div>
+
+						<div className="space-y-6">
+							<div className="border-2 border-dashed border-border p-12 text-center">
+								<p className="text-sm text-muted-foreground tracking-wide">
+									PLACEHOLDER
+								</p>
 							</div>
 						</div>
 					</div>
@@ -236,100 +248,17 @@ function App() {
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 03
 							</span>
-							<h2 className="text-2xl font-light">您的出生时间？</h2>
+							<h2 className="text-2xl font-light">内容待定</h2>
 							<p className="text-sm text-muted-foreground">
-								精确的出生时间对于准确的解读很重要
+								此步骤的内容将在后续开发中完善
 							</p>
 						</div>
 
 						<div className="space-y-6">
-							<div className="space-y-3">
-								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
-									出生时间
-								</label>
-								<div className="grid grid-cols-3 gap-4">
-									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70">
-											时
-										</span>
-										<select
-											value={formData.birthHour}
-											onChange={(e) => updateField("birthHour", e.target.value)}
-											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
-										>
-											<option value="" className="bg-background">
-												--
-											</option>
-											{HOURS.map((hour) => (
-												<option
-													key={hour}
-													value={hour}
-													className="bg-background"
-												>
-													{hour}
-												</option>
-											))}
-										</select>
-									</div>
-									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70">
-											分
-										</span>
-										<select
-											value={formData.birthMinute}
-											onChange={(e) =>
-												updateField("birthMinute", e.target.value)
-											}
-											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
-										>
-											<option value="" className="bg-background">
-												--
-											</option>
-											{MINUTES.map((minute) => (
-												<option
-													key={minute}
-													value={minute}
-													className="bg-background"
-												>
-													{minute}
-												</option>
-											))}
-										</select>
-									</div>
-									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70">
-											时段
-										</span>
-										<div className="flex border-2 border-border">
-											{[
-												{ label: "上午", value: "AM" },
-												{ label: "下午", value: "PM" },
-											].map((period) => (
-												<button
-													key={period.value}
-													type="button"
-													onClick={() => updateField("birthPeriod", period.value)}
-													className={`flex-1 p-3 text-sm transition-colors ${
-														formData.birthPeriod === period.value
-															? "bg-foreground text-background"
-															: "hover:bg-border"
-													}`}
-												>
-													{period.label}
-												</button>
-											))}
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div className="pt-4">
-								<button
-									type="button"
-									className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
-								>
-									我不知道确切的出生时间
-								</button>
+							<div className="border-2 border-dashed border-border p-12 text-center">
+								<p className="text-sm text-muted-foreground tracking-wide">
+									PLACEHOLDER
+								</p>
 							</div>
 						</div>
 					</div>
