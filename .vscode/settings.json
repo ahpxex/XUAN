@@ -1,4 +1,5 @@
 {
+  "python.defaultInterpreterPath": "${workspaceFolder}/src-backend/.venv/bin/python",
   "files.watcherExclude": {
     "**/routeTree.gen.ts": true
   },
