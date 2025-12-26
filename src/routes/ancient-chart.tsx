@@ -1,11 +1,12 @@
 import * as d3 from "d3";
 import { motion } from "framer-motion";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 // --- 配置区域 ---
 const ANCIENT_TEXT_RAW =
 	"角亢氐房心尾箕斗牛女虛危室壁奎婁胃昴畢觜參井鬼柳星張翼軫";
 const FULL_CHARS = Array(5).fill(ANCIENT_TEXT_RAW).join("").split("");
+const GOLDEN_RATIO = 0.618033988749895;
 
 interface Star {
 	x: number;
@@ -19,9 +20,23 @@ interface Star {
 export const AncientStarChart: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const [viewportWidth, setViewportWidth] = useState(
+		typeof window !== "undefined" ? window.innerWidth : 1920
+	);
+
+	// 监听窗口大小变化
+	useEffect(() => {
+		const handleResize = () => {
+			setViewportWidth(window.innerWidth);
+		};
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
 
 	// --- 尺寸参数 ---
-	const size = 800;
+	// 半径 = 页面宽度 * 黄金分割比
+	// size = 半径 * 2
+	const size = viewportWidth * GOLDEN_RATIO * 2;
 	const center = size / 2;
 	const bandWidth = 22;
 	const outerRadius = center - 40;
@@ -131,7 +146,7 @@ export const AncientStarChart: React.FC = () => {
 	}, [outerRadius, innerRadius]);
 
 	return (
-		<div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-[#000000]">
+		<div className="relative w-full h-screen overflow-hidden bg-[#000000]">
 			{/* Layer 1: 噪点纹理 - [修改点 4] 稍微降低噪点浓度，让星星更透亮 */}
 			<div
 				className="absolute inset-0 z-50 pointer-events-none opacity-20 mix-blend-overlay"
@@ -141,9 +156,16 @@ export const AncientStarChart: React.FC = () => {
 			/>
 
 			{/* Layer 2: 晕影 */}
-			<div className="absolute inset-0 z-40 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#000000_90%)]" />
+			<div className="absolute inset-0 z-40 pointer-events-none bg-[radial-gradient(circle_at_0%_center,transparent_0%,#000000_90%)]" />
 
-			<div className="relative" style={{ width: size, height: size }}>
+			<div
+				className="absolute top-1/2 left-0"
+				style={{
+					width: size,
+					height: size,
+					transform: 'translate(-50%, -50%)'
+				}}
+			>
 				{/* Layer 3: 星星 (Canvas) */}
 				<canvas
 					ref={canvasRef}
@@ -152,14 +174,12 @@ export const AncientStarChart: React.FC = () => {
 					className="absolute inset-0 z-10"
 				/>
 
-				{/* Layer 4: 旋转星盘 (SVG) - 保持不变 */}
+				{/* Layer 4: 旋转星盘 (SVG) - 已移除旋转动画 */}
 				<motion.svg
 					width={size}
 					height={size}
 					viewBox={`0 0 ${size} ${size}`}
 					className="absolute inset-0 z-20"
-					animate={{ rotate: 360 }}
-					transition={{ duration: 180, ease: "linear", repeat: Infinity }}
 				>
 					<defs>
 						<filter
