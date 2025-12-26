@@ -59,8 +59,7 @@ export const AncientStarChart: React.FC = () => {
 		const baseInnerRadius = 710;
 		const baseStarCount = 600;
 		const areaRatio =
-			(starLimitRadius * starLimitRadius) /
-			(baseInnerRadius * baseInnerRadius);
+			(starLimitRadius * starLimitRadius) / (baseInnerRadius * baseInnerRadius);
 		const starCount = Math.round(baseStarCount * areaRatio);
 
 		// [修改点 1]：调整星星生成的参数
@@ -179,7 +178,7 @@ export const AncientStarChart: React.FC = () => {
 				style={{
 					width: size,
 					height: size,
-					transform: 'translate(-50%, -50%)'
+					transform: "translate(-50%, -50%)",
 				}}
 			>
 				{/* Layer 3: 星星 (Canvas) */}
