@@ -26,6 +26,9 @@ export const currentBranchIndexAtom = atom(4);
 // 切换方向
 export const switchDirectionAtom = atom<"up" | "down">("down");
 
+// 动画进行中状态
+export const isAnimatingAtom = atom(false);
+
 // 派生 atom：当前地支文字
 export const currentBranchAtom = atom((get) => {
 	const index = get(currentBranchIndexAtom);

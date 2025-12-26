@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
 import {
 	EARTHLY_BRANCHES,
 	GOLDEN_RATIO,
+	isAnimatingAtom,
 	switchDirectionAtom,
 	viewportWidthAtom,
 } from "../atoms/viewport";
@@ -16,6 +17,8 @@ interface IconImageProps {
 export function IconImage({ index, onIndexChange }: IconImageProps) {
 	const viewportWidth = useAtomValue(viewportWidthAtom);
 	const [direction, setDirection] = useAtom(switchDirectionAtom);
+	const setIsAnimating = useSetAtom(isAnimatingAtom);
+	const isAnimating = useAtomValue(isAnimatingAtom);
 
 	// 计算图片位置，让图片圆和 StarChart 圆相交
 	const imageRight = viewportWidth * (1 - GOLDEN_RATIO) - 48;
@@ -30,19 +33,25 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 			if (e.key === "ArrowUp") {
 				e.preventDefault();
 				setDirection("up");
+				setIsAnimating(true);
 				const newIndex = (index - 1 + 12) % 12;
 				onIndexChange(newIndex);
+				// 动画持续时间后重置状态
+				setTimeout(() => setIsAnimating(false), 600);
 			} else if (e.key === "ArrowDown") {
 				e.preventDefault();
 				setDirection("down");
+				setIsAnimating(true);
 				const newIndex = (index + 1) % 12;
 				onIndexChange(newIndex);
+				// 动画持续时间后重置状态
+				setTimeout(() => setIsAnimating(false), 600);
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [index, onIndexChange, setDirection]);
+	}, [index, onIndexChange, setDirection, setIsAnimating]);
 
 	// 动画变体
 	const variants = {
@@ -62,8 +71,11 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 
 	return (
 		<div
-			className="absolute top-8 h-64 w-64 bg-black rounded-full z-[60] flex items-center justify-center overflow-hidden"
-			style={{ right: `${imageRight}px` }}
+			className="absolute top-8 h-64 w-64 rounded-full z-[60] flex items-center justify-center overflow-hidden"
+			style={{
+				right: `${imageRight}px`,
+				backgroundColor: isAnimating ? "transparent" : "black",
+			}}
 		>
 			{/* 固定的容器背景图片 - 也参与动画 */}
 			<AnimatePresence initial={false} custom={direction} mode="wait">
@@ -89,8 +101,7 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 				<motion.img
 					key={`branch-${index}`}
 					src={branchImagePath}
-					className="h-20 w-20 border-0 absolute invert"
-					style={{ left: "0.5rem", top: "0.5rem" }}
+					className="h-20 w-20 border-0 relative z-10 invert"
 					draggable={false}
 					alt={branchName}
 					custom={direction}
