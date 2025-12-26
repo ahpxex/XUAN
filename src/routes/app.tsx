@@ -16,7 +16,7 @@ function AppMain() {
 					type="button"
 					className="text-xs tracking-wide text-muted-foreground hover:text-foreground transition-colors"
 				>
-					Profile
+					个人
 				</button>
 			</header>
 
@@ -24,10 +24,9 @@ function AppMain() {
 			<main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
 				<div className="max-w-md w-full space-y-12 text-center">
 					<div className="space-y-4">
-						<h2 className="text-3xl font-light">Welcome</h2>
+						<h2 className="text-3xl font-light">欢迎</h2>
 						<p className="text-muted-foreground text-sm leading-relaxed">
-							Your journey of self-discovery begins here. Explore the ancient
-							wisdom to understand yourself deeper.
+							您的自我探索之旅从这里开始。探索古老的智慧，更深入地了解自己。
 						</p>
 					</div>
 
@@ -36,11 +35,11 @@ function AppMain() {
 							type="button"
 							className="w-full p-6 border-2 border-border hover:border-foreground text-left transition-colors group"
 						>
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground block mb-2">
-								Bazi
+							<span className="text-xs tracking-[0.2em] text-muted-foreground block mb-2">
+								八字
 							</span>
 							<span className="text-lg font-light group-hover:text-foreground transition-colors">
-								Four Pillars of Destiny
+								四柱命理
 							</span>
 						</button>
 
@@ -48,11 +47,11 @@ function AppMain() {
 							type="button"
 							className="w-full p-6 border-2 border-border hover:border-foreground text-left transition-colors group"
 						>
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground block mb-2">
-								Ziwei
+							<span className="text-xs tracking-[0.2em] text-muted-foreground block mb-2">
+								紫微
 							</span>
 							<span className="text-lg font-light group-hover:text-foreground transition-colors">
-								Purple Star Astrology
+								紫微斗数
 							</span>
 						</button>
 
@@ -60,11 +59,11 @@ function AppMain() {
 							type="button"
 							className="w-full p-6 border-2 border-border hover:border-foreground text-left transition-colors group"
 						>
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground block mb-2">
-								Qimen
+							<span className="text-xs tracking-[0.2em] text-muted-foreground block mb-2">
+								奇门
 							</span>
 							<span className="text-lg font-light group-hover:text-foreground transition-colors">
-								Qi Men Dun Jia
+								奇门遁甲
 							</span>
 						</button>
 					</div>
@@ -74,7 +73,7 @@ function AppMain() {
 			{/* Footer */}
 			<footer className="border-t border-border p-6">
 				<p className="text-center text-xs text-muted-foreground">
-					Understand yourself deeper
+					更深入地了解自己
 				</p>
 			</footer>
 		</div>

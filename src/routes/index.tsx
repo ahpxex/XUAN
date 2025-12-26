@@ -93,45 +93,47 @@ function App() {
 				{step === 1 && (
 					<div className="space-y-8">
 						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
-								Step 01
+							<span className="text-xs tracking-[0.2em] text-muted-foreground">
+								步骤 01
 							</span>
-							<h2 className="text-2xl font-light">Who are you?</h2>
+							<h2 className="text-2xl font-light">你是谁？</h2>
 						</div>
 
 						<div className="space-y-6">
 							<div className="space-y-2">
-								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
-									Your Name
+								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
+									姓名
 								</label>
 								<input
 									type="text"
 									value={formData.name}
 									onChange={(e) => updateField("name", e.target.value)}
-									placeholder="Enter your name"
+									placeholder="请输入您的姓名"
 									className="w-full bg-transparent border-b-2 border-border focus:border-foreground outline-none py-3 text-lg transition-colors placeholder:text-muted-foreground/50"
 								/>
 							</div>
 
 							<div className="space-y-3">
-								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
-									Gender
+								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
+									性别
 								</label>
 								<div className="flex gap-4">
-									{["Male", "Female", "Other"].map((option) => (
+									{[
+										{ label: "男", value: "male" },
+										{ label: "女", value: "female" },
+										{ label: "其他", value: "other" },
+									].map((option) => (
 										<button
-											key={option}
+											key={option.value}
 											type="button"
-											onClick={() =>
-												updateField("gender", option.toLowerCase())
-											}
+											onClick={() => updateField("gender", option.value)}
 											className={`px-6 py-3 border-2 text-sm tracking-wide transition-colors ${
-												formData.gender === option.toLowerCase()
+												formData.gender === option.value
 													? "border-foreground bg-foreground text-background"
 													: "border-border hover:border-muted-foreground"
 											}`}
 										>
-											{option}
+											{option.label}
 										</button>
 									))}
 								</div>
@@ -143,21 +145,21 @@ function App() {
 				{step === 2 && (
 					<div className="space-y-8">
 						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
-								Step 02
+							<span className="text-xs tracking-[0.2em] text-muted-foreground">
+								步骤 02
 							</span>
-							<h2 className="text-2xl font-light">When were you born?</h2>
+							<h2 className="text-2xl font-light">您的出生日期？</h2>
 						</div>
 
 						<div className="space-y-6">
 							<div className="space-y-3">
-								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
-									Birth Date
+								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
+									出生日期
 								</label>
 								<div className="grid grid-cols-3 gap-4">
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Year
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											年
 										</span>
 										<select
 											value={formData.birthYear}
@@ -179,8 +181,8 @@ function App() {
 										</select>
 									</div>
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Month
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											月
 										</span>
 										<select
 											value={formData.birthMonth}
@@ -204,8 +206,8 @@ function App() {
 										</select>
 									</div>
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Day
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											日
 										</span>
 										<select
 											value={formData.birthDay}
@@ -231,24 +233,24 @@ function App() {
 				{step === 3 && (
 					<div className="space-y-8">
 						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
-								Step 03
+							<span className="text-xs tracking-[0.2em] text-muted-foreground">
+								步骤 03
 							</span>
-							<h2 className="text-2xl font-light">What time were you born?</h2>
+							<h2 className="text-2xl font-light">您的出生时间？</h2>
 							<p className="text-sm text-muted-foreground">
-								The exact birth time is important for accurate readings
+								精确的出生时间对于准确的解读很重要
 							</p>
 						</div>
 
 						<div className="space-y-6">
 							<div className="space-y-3">
-								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
-									Birth Time
+								<label className="text-xs tracking-[0.15em] text-muted-foreground block">
+									出生时间
 								</label>
 								<div className="grid grid-cols-3 gap-4">
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Hour
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											时
 										</span>
 										<select
 											value={formData.birthHour}
@@ -270,8 +272,8 @@ function App() {
 										</select>
 									</div>
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Minute
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											分
 										</span>
 										<select
 											value={formData.birthMinute}
@@ -295,22 +297,25 @@ function App() {
 										</select>
 									</div>
 									<div className="space-y-1">
-										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
-											Period
+										<span className="text-[10px] tracking-wide text-muted-foreground/70">
+											时段
 										</span>
 										<div className="flex border-2 border-border">
-											{["AM", "PM"].map((period) => (
+											{[
+												{ label: "上午", value: "AM" },
+												{ label: "下午", value: "PM" },
+											].map((period) => (
 												<button
-													key={period}
+													key={period.value}
 													type="button"
-													onClick={() => updateField("birthPeriod", period)}
+													onClick={() => updateField("birthPeriod", period.value)}
 													className={`flex-1 p-3 text-sm transition-colors ${
-														formData.birthPeriod === period
+														formData.birthPeriod === period.value
 															? "bg-foreground text-background"
 															: "hover:bg-border"
 													}`}
 												>
-													{period}
+													{period.label}
 												</button>
 											))}
 										</div>
@@ -323,7 +328,7 @@ function App() {
 									type="button"
 									className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
 								>
-									I don't know my exact birth time
+									我不知道确切的出生时间
 								</button>
 							</div>
 						</div>
@@ -340,7 +345,7 @@ function App() {
 						disabled={step === 1}
 						className="text-sm tracking-wide text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
-						Back
+						返回
 					</button>
 
 					<span className="text-xs text-muted-foreground">
@@ -359,7 +364,7 @@ function App() {
 						disabled={!canProceed()}
 						className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
-						{step === totalSteps ? "Complete" : "Continue"}
+						{step === totalSteps ? "完成" : "继续"}
 					</button>
 				</div>
 			</footer>
