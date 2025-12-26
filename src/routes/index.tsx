@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -21,6 +21,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, "0"));
 
 function App() {
+	const navigate = useNavigate();
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
@@ -314,7 +315,7 @@ function App() {
 							if (step < totalSteps) {
 								setStep((s) => s + 1);
 							} else {
-								console.log("Form submitted:", formData);
+								navigate({ to: "/app" });
 							}
 						}}
 						disabled={!canProceed()}

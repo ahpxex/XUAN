@@ -1,0 +1,21 @@
+# Xuanxue
+
+A xuanxue (Chinese metaphysics) app that helps people understand themselves deeper and deeper.
+
+## Purpose
+
+This app collects personal information (name, gender, birth date, exact birth time) and uses traditional Chinese metaphysical systems to provide insights and self-understanding.
+
+## Tech Stack
+
+- TanStack Start (React 19)
+- TanStack Router
+- Tailwind CSS v4
+- Cloudflare Workers (deployment)
+
+## Design
+
+- Minimalistic brutalist design
+- Global dark theme
+- Sharp corners, clean typography
+- Wide letter-spacing on labels
