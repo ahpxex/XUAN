@@ -29,11 +29,12 @@ function AppMain() {
 	return (
 		<div className="relative min-h-screen bg-background text-foreground">
 			<StarChart />
-			<img
-				className="absolute top-8 h-64 w-64 border-0 z-[60]"
+			<div
+				className="absolute top-8 h-64 w-64 bg-black rounded-full z-[60]"
 				style={{ right: `${imageRight}px` }}
-				src="./icon.png"
-			/>
+			>
+				<img className="h-64 w-64 border-0" src="./icon.png" />
+			</div>
 		</div>
 	);
 }
