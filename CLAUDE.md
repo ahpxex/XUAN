@@ -18,6 +18,7 @@ This app collects personal information (name, gender, birth date, exact birth ti
 - TanStack Start (React 19)
 - TanStack Router
 - Tailwind CSS v4
+- iztro, a lightweight kit for generating astrolabes for Zi Wei Dou Shu (The Purple Star Astrology), an ancient Chinese astrology.
 - Jotai for state management, just use local storage for data persistence.
 
 - Cloudflare Workers (deployment)
