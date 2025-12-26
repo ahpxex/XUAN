@@ -1,12 +1,13 @@
 import * as d3 from "d3";
 import { motion } from "framer-motion";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import React, { useEffect, useMemo, useRef } from "react";
+import { GOLDEN_RATIO, viewportWidthAtom } from "../atoms/viewport";
 
 // --- 配置区域 ---
 const ANCIENT_TEXT_RAW =
 	"角亢氐房心尾箕斗牛女虛危室壁奎婁胃昴畢觜參井鬼柳星張翼軫";
 const FULL_CHARS = Array(5).fill(ANCIENT_TEXT_RAW).join("").split("");
-const GOLDEN_RATIO = 0.618033988749895;
 
 interface Star {
 	x: number;
@@ -20,7 +21,7 @@ interface Star {
 export const AncientStarChart: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [viewportWidth, setViewportWidth] = useState(0);
+	const [viewportWidth, setViewportWidth] = useAtom(viewportWidthAtom);
 
 	// 监听窗口大小变化并在组件挂载时立即设置
 	useEffect(() => {
@@ -32,7 +33,7 @@ export const AncientStarChart: React.FC = () => {
 		};
 		window.addEventListener("resize", handleResize);
 		return () => window.removeEventListener("resize", handleResize);
-	}, []);
+	}, [setViewportWidth]);
 
 	// --- 尺寸参数 ---
 	// 半径 = 页面宽度 * 黄金分割比
