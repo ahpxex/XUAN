@@ -60,10 +60,10 @@ export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex
 		const starLimitRadius = innerRadius - 15;
 
 		// 动态计算粒子数量，保持密度恒定
-		// 基准：size=1500 时，innerRadius≈710，面积≈1,585,000，粒子数=600
-		// 密度 = 600 / 1,585,000 ≈ 0.000378
+		// 基准：size=1500 时，innerRadius≈710，面积≈1,585,000，粒子数=1200
+		// 密度 = 1200 / 1,585,000 ≈ 0.000757
 		const baseInnerRadius = 710;
-		const baseStarCount = 600;
+		const baseStarCount = 1200;
 		const areaRatio =
 			(starLimitRadius * starLimitRadius) / (baseInnerRadius * baseInnerRadius);
 		const starCount = Math.round(baseStarCount * areaRatio);
@@ -179,23 +179,15 @@ export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex
 			{/* Layer 2: 晕影 */}
 			<div className="absolute inset-0 z-40 pointer-events-none bg-[radial-gradient(circle_at_0%_center,transparent_0%,#000000_90%)]" />
 
-			<motion.div
-				key={currentIndex}
+			<div
 				className="absolute top-1/2 left-0"
 				style={{
 					width: size,
 					height: size,
-					x: "-50%",
-					y: "-50%",
-				}}
-				initial={{ rotate: direction === "up" ? 30 : -30, opacity: 0 }}
-				animate={{ rotate: 0, opacity: 1 }}
-				transition={{
-					rotate: { type: "spring", stiffness: 200, damping: 30 },
-					opacity: { duration: 0.3 },
+					transform: "translate(-50%, -50%)",
 				}}
 			>
-				{/* Layer 3: 星星 (Canvas) */}
+				{/* Layer 3: 星星 (Canvas) - 保持稳定，不参与动画 */}
 				<canvas
 					ref={canvasRef}
 					width={size}
@@ -203,12 +195,19 @@ export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex
 					className="absolute inset-0 z-10"
 				/>
 
-				{/* Layer 4: 旋转星盘 (SVG) - 已移除旋转动画 */}
+				{/* Layer 4: 旋转星盘 (SVG) - 参与动画 */}
 				<motion.svg
+					key={currentIndex}
 					width={size}
 					height={size}
 					viewBox={`0 0 ${size} ${size}`}
 					className="absolute inset-0 z-20"
+					initial={{ rotate: direction === "up" ? 30 : -30, opacity: 0 }}
+					animate={{ rotate: 0, opacity: 1 }}
+					transition={{
+						rotate: { type: "spring", stiffness: 200, damping: 30 },
+						opacity: { duration: 0.3 },
+					}}
 				>
 					<defs>
 						<filter
@@ -327,7 +326,7 @@ export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex
 						</motion.g>
 					</g>
 				</motion.svg>
-			</motion.div>
+			</div>
 		</div>
 	);
 };
