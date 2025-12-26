@@ -1,118 +1,329 @@
-import { createFileRoute } from '@tanstack/react-router'
-import {
-  Zap,
-  Server,
-  Route as RouteIcon,
-  Shield,
-  Waves,
-  Sparkles,
-} from 'lucide-react'
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute("/")({ component: App });
+
+interface FormData {
+	name: string;
+	gender: string;
+	birthYear: string;
+	birthMonth: string;
+	birthDay: string;
+	birthHour: string;
+	birthMinute: string;
+	birthPeriod: string;
+}
+
+const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"));
+const MINUTES = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+const YEARS = Array.from({ length: 100 }, (_, i) => (new Date().getFullYear() - i).toString());
+const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"));
+const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, "0"));
 
 function App() {
-  const features = [
-    {
-      icon: <Zap className="w-12 h-12 text-cyan-400" />,
-      title: 'Powerful Server Functions',
-      description:
-        'Write server-side code that seamlessly integrates with your client components. Type-safe, secure, and simple.',
-    },
-    {
-      icon: <Server className="w-12 h-12 text-cyan-400" />,
-      title: 'Flexible Server Side Rendering',
-      description:
-        'Full-document SSR, streaming, and progressive enhancement out of the box. Control exactly what renders where.',
-    },
-    {
-      icon: <RouteIcon className="w-12 h-12 text-cyan-400" />,
-      title: 'API Routes',
-      description:
-        'Build type-safe API endpoints alongside your application. No separate backend needed.',
-    },
-    {
-      icon: <Shield className="w-12 h-12 text-cyan-400" />,
-      title: 'Strongly Typed Everything',
-      description:
-        'End-to-end type safety from server to client. Catch errors before they reach production.',
-    },
-    {
-      icon: <Waves className="w-12 h-12 text-cyan-400" />,
-      title: 'Full Streaming Support',
-      description:
-        'Stream data from server to client progressively. Perfect for AI applications and real-time updates.',
-    },
-    {
-      icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
-      title: 'Next Generation Ready',
-      description:
-        'Built from the ground up for modern web applications. Deploy anywhere JavaScript runs.',
-    },
-  ]
+	const [step, setStep] = useState(1);
+	const [formData, setFormData] = useState<FormData>({
+		name: "",
+		gender: "",
+		birthYear: "",
+		birthMonth: "",
+		birthDay: "",
+		birthHour: "",
+		birthMinute: "",
+		birthPeriod: "AM",
+	});
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
-        <div className="relative max-w-5xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
-            />
-            <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
-              <span className="text-gray-300">TANSTACK</span>{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                START
-              </span>
-            </h1>
-          </div>
-          <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
-            The framework for next generation AI applications
-          </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-            Full-stack framework powered by TanStack Router for React and Solid.
-            Build modern applications with server functions, streaming, and type
-            safety.
-          </p>
-          <div className="flex flex-col items-center gap-4">
-            <a
-              href="https://tanstack.com/start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/50"
-            >
-              Documentation
-            </a>
-            <p className="text-gray-400 text-sm mt-2">
-              Begin your TanStack Start journey by editing{' '}
-              <code className="px-2 py-1 bg-slate-700 rounded text-cyan-400">
-                /src/routes/index.tsx
-              </code>
-            </p>
-          </div>
-        </div>
-      </section>
+	const updateField = (field: keyof FormData, value: string) => {
+		setFormData((prev) => ({ ...prev, [field]: value }));
+	};
 
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  )
+	const canProceed = () => {
+		if (step === 1) {
+			return formData.name.trim() !== "" && formData.gender !== "";
+		}
+		if (step === 2) {
+			return formData.birthYear !== "" && formData.birthMonth !== "" && formData.birthDay !== "";
+		}
+		if (step === 3) {
+			return formData.birthHour !== "" && formData.birthMinute !== "";
+		}
+		return true;
+	};
+
+	const totalSteps = 3;
+
+	return (
+		<div className="min-h-screen bg-background text-foreground flex flex-col">
+			{/* Header */}
+			<header className="border-b border-border p-6">
+				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">Xuanxue</h1>
+			</header>
+
+			{/* Progress */}
+			<div className="border-b border-border">
+				<div className="flex">
+					{Array.from({ length: totalSteps }, (_, i) => (
+						<div
+							key={i}
+							className={`flex-1 h-1 ${i + 1 <= step ? "bg-foreground" : "bg-border"}`}
+						/>
+					))}
+				</div>
+			</div>
+
+			{/* Main Content */}
+			<main className="flex-1 flex flex-col justify-center px-6 py-12 max-w-lg mx-auto w-full">
+				{step === 1 && (
+					<div className="space-y-8">
+						<div className="space-y-2">
+							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
+								Step 01
+							</span>
+							<h2 className="text-2xl font-light">Who are you?</h2>
+						</div>
+
+						<div className="space-y-6">
+							<div className="space-y-2">
+								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
+									Your Name
+								</label>
+								<input
+									type="text"
+									value={formData.name}
+									onChange={(e) => updateField("name", e.target.value)}
+									placeholder="Enter your name"
+									className="w-full bg-transparent border-b-2 border-border focus:border-foreground outline-none py-3 text-lg transition-colors placeholder:text-muted-foreground/50"
+								/>
+							</div>
+
+							<div className="space-y-3">
+								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
+									Gender
+								</label>
+								<div className="flex gap-4">
+									{["Male", "Female", "Other"].map((option) => (
+										<button
+											key={option}
+											type="button"
+											onClick={() => updateField("gender", option.toLowerCase())}
+											className={`px-6 py-3 border-2 text-sm tracking-wide transition-colors ${
+												formData.gender === option.toLowerCase()
+													? "border-foreground bg-foreground text-background"
+													: "border-border hover:border-muted-foreground"
+											}`}
+										>
+											{option}
+										</button>
+									))}
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{step === 2 && (
+					<div className="space-y-8">
+						<div className="space-y-2">
+							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
+								Step 02
+							</span>
+							<h2 className="text-2xl font-light">When were you born?</h2>
+						</div>
+
+						<div className="space-y-6">
+							<div className="space-y-3">
+								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
+									Birth Date
+								</label>
+								<div className="grid grid-cols-3 gap-4">
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Year
+										</span>
+										<select
+											value={formData.birthYear}
+											onChange={(e) => updateField("birthYear", e.target.value)}
+											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+										>
+											<option value="" className="bg-background">
+												--
+											</option>
+											{YEARS.map((year) => (
+												<option key={year} value={year} className="bg-background">
+													{year}
+												</option>
+											))}
+										</select>
+									</div>
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Month
+										</span>
+										<select
+											value={formData.birthMonth}
+											onChange={(e) => updateField("birthMonth", e.target.value)}
+											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+										>
+											<option value="" className="bg-background">
+												--
+											</option>
+											{MONTHS.map((month) => (
+												<option key={month} value={month} className="bg-background">
+													{month}
+												</option>
+											))}
+										</select>
+									</div>
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Day
+										</span>
+										<select
+											value={formData.birthDay}
+											onChange={(e) => updateField("birthDay", e.target.value)}
+											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+										>
+											<option value="" className="bg-background">
+												--
+											</option>
+											{DAYS.map((day) => (
+												<option key={day} value={day} className="bg-background">
+													{day}
+												</option>
+											))}
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{step === 3 && (
+					<div className="space-y-8">
+						<div className="space-y-2">
+							<span className="text-xs tracking-[0.2em] uppercase text-muted-foreground">
+								Step 03
+							</span>
+							<h2 className="text-2xl font-light">What time were you born?</h2>
+							<p className="text-sm text-muted-foreground">
+								The exact birth time is important for accurate readings
+							</p>
+						</div>
+
+						<div className="space-y-6">
+							<div className="space-y-3">
+								<label className="text-xs tracking-[0.15em] uppercase text-muted-foreground block">
+									Birth Time
+								</label>
+								<div className="grid grid-cols-3 gap-4">
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Hour
+										</span>
+										<select
+											value={formData.birthHour}
+											onChange={(e) => updateField("birthHour", e.target.value)}
+											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+										>
+											<option value="" className="bg-background">
+												--
+											</option>
+											{HOURS.map((hour) => (
+												<option key={hour} value={hour} className="bg-background">
+													{hour}
+												</option>
+											))}
+										</select>
+									</div>
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Minute
+										</span>
+										<select
+											value={formData.birthMinute}
+											onChange={(e) => updateField("birthMinute", e.target.value)}
+											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
+										>
+											<option value="" className="bg-background">
+												--
+											</option>
+											{MINUTES.map((minute) => (
+												<option key={minute} value={minute} className="bg-background">
+													{minute}
+												</option>
+											))}
+										</select>
+									</div>
+									<div className="space-y-1">
+										<span className="text-[10px] tracking-wide text-muted-foreground/70 uppercase">
+											Period
+										</span>
+										<div className="flex border-2 border-border">
+											{["AM", "PM"].map((period) => (
+												<button
+													key={period}
+													type="button"
+													onClick={() => updateField("birthPeriod", period)}
+													className={`flex-1 p-3 text-sm transition-colors ${
+														formData.birthPeriod === period
+															? "bg-foreground text-background"
+															: "hover:bg-border"
+													}`}
+												>
+													{period}
+												</button>
+											))}
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div className="pt-4">
+								<button
+									type="button"
+									className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+								>
+									I don't know my exact birth time
+								</button>
+							</div>
+						</div>
+					</div>
+				)}
+			</main>
+
+			{/* Navigation */}
+			<footer className="border-t border-border p-6">
+				<div className="max-w-lg mx-auto w-full flex justify-between items-center">
+					<button
+						type="button"
+						onClick={() => setStep((s) => Math.max(1, s - 1))}
+						disabled={step === 1}
+						className="text-sm tracking-wide text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+					>
+						Back
+					</button>
+
+					<span className="text-xs text-muted-foreground">
+						{step} / {totalSteps}
+					</span>
+
+					<button
+						type="button"
+						onClick={() => {
+							if (step < totalSteps) {
+								setStep((s) => s + 1);
+							} else {
+								console.log("Form submitted:", formData);
+							}
+						}}
+						disabled={!canProceed()}
+						className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+					>
+						{step === totalSteps ? "Complete" : "Continue"}
+					</button>
+				</div>
+			</footer>
+		</div>
+	);
 }
