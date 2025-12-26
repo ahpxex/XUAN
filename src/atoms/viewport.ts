@@ -23,6 +23,9 @@ export const EARTHLY_BRANCHES = [
 // 当前选中的地支索引
 export const currentBranchIndexAtom = atom(4);
 
+// 切换方向
+export const switchDirectionAtom = atom<"up" | "down">("down");
+
 // 派生 atom：当前地支文字
 export const currentBranchAtom = atom((get) => {
 	const index = get(currentBranchIndexAtom);

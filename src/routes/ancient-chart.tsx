@@ -1,8 +1,8 @@
 import * as d3 from "d3";
 import { motion } from "framer-motion";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useMemo, useRef } from "react";
-import { GOLDEN_RATIO, viewportWidthAtom } from "../atoms/viewport";
+import { GOLDEN_RATIO, switchDirectionAtom, viewportWidthAtom } from "../atoms/viewport";
 
 // --- 配置区域 ---
 const ANCIENT_TEXT_RAW =
@@ -18,10 +18,15 @@ interface Star {
 	opacity: number;
 }
 
-export const AncientStarChart: React.FC = () => {
+interface AncientStarChartProps {
+	currentIndex: number;
+}
+
+export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [viewportWidth, setViewportWidth] = useAtom(viewportWidthAtom);
+	const direction = useAtomValue(switchDirectionAtom);
 
 	// 监听窗口大小变化并在组件挂载时立即设置
 	useEffect(() => {
@@ -174,12 +179,20 @@ export const AncientStarChart: React.FC = () => {
 			{/* Layer 2: 晕影 */}
 			<div className="absolute inset-0 z-40 pointer-events-none bg-[radial-gradient(circle_at_0%_center,transparent_0%,#000000_90%)]" />
 
-			<div
+			<motion.div
+				key={currentIndex}
 				className="absolute top-1/2 left-0"
 				style={{
 					width: size,
 					height: size,
-					transform: "translate(-50%, -50%)",
+					x: "-50%",
+					y: "-50%",
+				}}
+				initial={{ rotate: direction === "up" ? 30 : -30, opacity: 0 }}
+				animate={{ rotate: 0, opacity: 1 }}
+				transition={{
+					rotate: { type: "spring", stiffness: 200, damping: 30 },
+					opacity: { duration: 0.3 },
 				}}
 			>
 				{/* Layer 3: 星星 (Canvas) */}
@@ -314,7 +327,7 @@ export const AncientStarChart: React.FC = () => {
 						</motion.g>
 					</g>
 				</motion.svg>
-			</div>
+			</motion.div>
 		</div>
 	);
 };

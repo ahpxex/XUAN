@@ -1,7 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
-import { EARTHLY_BRANCHES, GOLDEN_RATIO, viewportWidthAtom } from "../atoms/viewport";
+import { useAtom, useAtomValue } from "jotai";
+import { useEffect } from "react";
+import {
+	EARTHLY_BRANCHES,
+	GOLDEN_RATIO,
+	switchDirectionAtom,
+	viewportWidthAtom,
+} from "../atoms/viewport";
 
 interface IconImageProps {
 	index: number;
@@ -10,7 +15,7 @@ interface IconImageProps {
 
 export function IconImage({ index, onIndexChange }: IconImageProps) {
 	const viewportWidth = useAtomValue(viewportWidthAtom);
-	const [direction, setDirection] = useState<"up" | "down">("down");
+	const [direction, setDirection] = useAtom(switchDirectionAtom);
 
 	// 计算图片位置，让图片圆和 StarChart 圆相交
 	const imageRight = viewportWidth * (1 - GOLDEN_RATIO) - 48;
@@ -37,7 +42,7 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [index, onIndexChange]);
+	}, [index, onIndexChange, setDirection]);
 
 	// 动画变体
 	const variants = {
