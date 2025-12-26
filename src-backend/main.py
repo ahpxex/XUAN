@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Xuanxue RAG Backend",
+    title="Xuan RAG Backend",
     description="RAG API with LlamaIndex and Qdrant",
     version="0.1.0",
     lifespan=lifespan,

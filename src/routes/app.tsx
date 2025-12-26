@@ -9,7 +9,9 @@ function AppMain() {
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			{/* Header */}
 			<header className="border-b border-border p-6 flex justify-between items-center">
-				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">Xuanxue</h1>
+				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">
+					xuan
+				</h1>
 				<button
 					type="button"
 					className="text-xs tracking-wide text-muted-foreground hover:text-foreground transition-colors"
@@ -24,8 +26,8 @@ function AppMain() {
 					<div className="space-y-4">
 						<h2 className="text-3xl font-light">Welcome</h2>
 						<p className="text-muted-foreground text-sm leading-relaxed">
-							Your journey of self-discovery begins here. Explore the ancient wisdom
-							to understand yourself deeper.
+							Your journey of self-discovery begins here. Explore the ancient
+							wisdom to understand yourself deeper.
 						</p>
 					</div>
 

@@ -4,7 +4,7 @@ This is a sample document for testing the RAG backend.
 
 ## Overview
 
-The Xuanxue RAG backend uses LlamaIndex and Qdrant for text retrieval with streaming support.
+The xuan RAG backend uses LlamaIndex and Qdrant for text retrieval with streaming support.
 
 ## Features
 

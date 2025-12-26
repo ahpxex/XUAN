@@ -14,11 +14,21 @@ interface FormData {
 	birthPeriod: string;
 }
 
-const HOURS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"));
-const MINUTES = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
-const YEARS = Array.from({ length: 100 }, (_, i) => (new Date().getFullYear() - i).toString());
-const MONTHS = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"));
-const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, "0"));
+const HOURS = Array.from({ length: 12 }, (_, i) =>
+	(i + 1).toString().padStart(2, "0"),
+);
+const MINUTES = Array.from({ length: 60 }, (_, i) =>
+	i.toString().padStart(2, "0"),
+);
+const YEARS = Array.from({ length: 100 }, (_, i) =>
+	(new Date().getFullYear() - i).toString(),
+);
+const MONTHS = Array.from({ length: 12 }, (_, i) =>
+	(i + 1).toString().padStart(2, "0"),
+);
+const DAYS = Array.from({ length: 31 }, (_, i) =>
+	(i + 1).toString().padStart(2, "0"),
+);
 
 function App() {
 	const navigate = useNavigate();
@@ -43,7 +53,11 @@ function App() {
 			return formData.name.trim() !== "" && formData.gender !== "";
 		}
 		if (step === 2) {
-			return formData.birthYear !== "" && formData.birthMonth !== "" && formData.birthDay !== "";
+			return (
+				formData.birthYear !== "" &&
+				formData.birthMonth !== "" &&
+				formData.birthDay !== ""
+			);
 		}
 		if (step === 3) {
 			return formData.birthHour !== "" && formData.birthMinute !== "";
@@ -57,7 +71,9 @@ function App() {
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			{/* Header */}
 			<header className="border-b border-border p-6">
-				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">Xuanxue</h1>
+				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">
+					xuan
+				</h1>
 			</header>
 
 			{/* Progress */}
@@ -106,7 +122,9 @@ function App() {
 										<button
 											key={option}
 											type="button"
-											onClick={() => updateField("gender", option.toLowerCase())}
+											onClick={() =>
+												updateField("gender", option.toLowerCase())
+											}
 											className={`px-6 py-3 border-2 text-sm tracking-wide transition-colors ${
 												formData.gender === option.toLowerCase()
 													? "border-foreground bg-foreground text-background"
@@ -150,7 +168,11 @@ function App() {
 												--
 											</option>
 											{YEARS.map((year) => (
-												<option key={year} value={year} className="bg-background">
+												<option
+													key={year}
+													value={year}
+													className="bg-background"
+												>
 													{year}
 												</option>
 											))}
@@ -162,14 +184,20 @@ function App() {
 										</span>
 										<select
 											value={formData.birthMonth}
-											onChange={(e) => updateField("birthMonth", e.target.value)}
+											onChange={(e) =>
+												updateField("birthMonth", e.target.value)
+											}
 											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
 										>
 											<option value="" className="bg-background">
 												--
 											</option>
 											{MONTHS.map((month) => (
-												<option key={month} value={month} className="bg-background">
+												<option
+													key={month}
+													value={month}
+													className="bg-background"
+												>
 													{month}
 												</option>
 											))}
@@ -231,7 +259,11 @@ function App() {
 												--
 											</option>
 											{HOURS.map((hour) => (
-												<option key={hour} value={hour} className="bg-background">
+												<option
+													key={hour}
+													value={hour}
+													className="bg-background"
+												>
 													{hour}
 												</option>
 											))}
@@ -243,14 +275,20 @@ function App() {
 										</span>
 										<select
 											value={formData.birthMinute}
-											onChange={(e) => updateField("birthMinute", e.target.value)}
+											onChange={(e) =>
+												updateField("birthMinute", e.target.value)
+											}
 											className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm appearance-none cursor-pointer hover:border-muted-foreground transition-colors"
 										>
 											<option value="" className="bg-background">
 												--
 											</option>
 											{MINUTES.map((minute) => (
-												<option key={minute} value={minute} className="bg-background">
+												<option
+													key={minute}
+													value={minute}
+													className="bg-background"
+												>
 													{minute}
 												</option>
 											))}

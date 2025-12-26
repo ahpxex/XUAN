@@ -1,6 +1,6 @@
-# Xuanxue
+# XUAN
 
-A xuanxue (Chinese metaphysics) app that helps people understand themselves deeper and deeper.
+The XUAN (Chinese metaphysics) app that helps people understand themselves deeper and deeper.
 
 ## Purpose
 
@@ -11,6 +11,8 @@ This app collects personal information (name, gender, birth date, exact birth ti
 - TanStack Start (React 19)
 - TanStack Router
 - Tailwind CSS v4
+- Jotai for state management, just use local storage for data persistence. 
+
 - Cloudflare Workers (deployment)
 
 ## Design

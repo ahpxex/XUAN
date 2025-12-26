@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # Qdrant
     qdrant_url: str
     qdrant_api_key: str
-    qdrant_collection_name: str = "xuanxue_documents"
+    qdrant_collection_name: str = "Xuan_documents"
 
     # LLM
     llm_api_base: str
