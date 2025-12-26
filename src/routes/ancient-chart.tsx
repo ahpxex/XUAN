@@ -20,12 +20,13 @@ interface Star {
 export const AncientStarChart: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [viewportWidth, setViewportWidth] = useState(
-		typeof window !== "undefined" ? window.innerWidth : 1920
-	);
+	const [viewportWidth, setViewportWidth] = useState(0);
 
-	// 监听窗口大小变化
+	// 监听窗口大小变化并在组件挂载时立即设置
 	useEffect(() => {
+		// 立即设置初始宽度
+		setViewportWidth(window.innerWidth);
+
 		const handleResize = () => {
 			setViewportWidth(window.innerWidth);
 		};
@@ -52,8 +53,18 @@ export const AncientStarChart: React.FC = () => {
 
 		const starLimitRadius = innerRadius - 15;
 
+		// 动态计算粒子数量，保持密度恒定
+		// 基准：size=1500 时，innerRadius≈710，面积≈1,585,000，粒子数=600
+		// 密度 = 600 / 1,585,000 ≈ 0.000378
+		const baseInnerRadius = 710;
+		const baseStarCount = 600;
+		const areaRatio =
+			(starLimitRadius * starLimitRadius) /
+			(baseInnerRadius * baseInnerRadius);
+		const starCount = Math.round(baseStarCount * areaRatio);
+
 		// [修改点 1]：调整星星生成的参数
-		const stars: Star[] = Array.from({ length: 250 }).map(() => {
+		const stars: Star[] = Array.from({ length: starCount }).map(() => {
 			const r = Math.sqrt(Math.random()) * starLimitRadius;
 			const theta = Math.random() * 2 * Math.PI;
 			return {
@@ -144,6 +155,11 @@ export const AncientStarChart: React.FC = () => {
 			};
 		});
 	}, [outerRadius, innerRadius]);
+
+	// 在获取真实窗口宽度之前不渲染，避免闪烁
+	if (viewportWidth === 0) {
+		return null;
+	}
 
 	return (
 		<div className="relative w-full h-screen overflow-hidden bg-[#000000]">
