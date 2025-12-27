@@ -30,21 +30,21 @@ export function PalaceStamp({ text, stars = [] }: PalaceStampProps) {
 					{stars.map((star, starIndex) => (
 						<div
 							key={starIndex}
-							className="px-2 py-4 flex flex-col items-center flex-shrink-0"
+							className="px-2 py-4 flex flex-row gap-1 flex-shrink-0"
 						>
-							{/* 星名 */}
-							<span
-								className="text-white text-xl font-bold mb-2"
-								style={{ writingMode: "vertical-rl" }}
-							>
-								{star.name}
-							</span>
 							{/* 属性 */}
 							<span
-								className="text-white/70 text-base"
+								className="text-white/70 text-xl max-h-[90vh]"
 								style={{ writingMode: "vertical-rl" }}
 							>
 								{star.properties}
+							</span>
+							{/* 星名 - 显示在属性文字右侧 */}
+							<span
+								className="text-white text-2xl font-bold"
+								style={{ writingMode: "vertical-rl" }}
+							>
+								{star.name}
 							</span>
 						</div>
 					))}
