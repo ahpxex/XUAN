@@ -33,14 +33,14 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ziwei", tags=["Ziwei"])
 
 # Simple prompt for quick overview (legacy endpoint)
-SIMPLE_SYSTEM_PROMPT = """You are an expert in Zi Wei Dou Shu (Purple Star Astrology), a traditional Chinese astrological system.
-Based on the provided astrolabe data, provide a brief, insightful interpretation focusing on:
+SIMPLE_SYSTEM_PROMPT = """Provide a brief, insightful Zi Wei Dou Shu interpretation based on the provided astrolabe data, focusing on:
 1. The person's core personality traits based on their Life Palace
 2. Key strengths and potential challenges
 3. General life direction and opportunities
 
 Keep your response concise (2-3 paragraphs), written in Chinese, and focus on practical insights.
-Do not list technical astrology terms extensively - explain in accessible language."""
+Do not list technical astrology terms extensively - explain in accessible language.
+Do not include greetings or self-introductions. Do not mention being a master/expert. Start directly with the analysis."""
 
 
 def build_palace_analysis_prompt(
@@ -55,7 +55,8 @@ def build_palace_analysis_prompt(
     context: str,
 ) -> str:
     """Build the detailed prompt for palace analysis."""
-    return f"""你是紫薇斗数大师. 对**{palace_name}**进行深度分析，能用朴实的语言为求问人提供翔实易懂的分析.
+    return f"""请基于紫薇斗数对**{palace_name}**进行深度分析，语言朴实直接，提供翔实易懂的解读。
+请直接进入分析，不要寒暄或自我介绍。
 
 ## 1. 本宫
 - 主星: {major_stars}
@@ -78,8 +79,9 @@ def build_palace_analysis_prompt(
 2.  **星曜互涉**: 必须分析本宫星曜与对宫星曜的"冲、照、拱、夹"关系，不能孤立论命。
 3.  **四化驱动**: 必须详细解释"宫干四化"及"生年四化"如何引动吉凶，这是动态分析的关键。
 4.  **古今结合**: 将RAG提供的古籍在分析中使用，引用古籍时，必须完整引用，并结合语境进行解释，拒绝生搬硬套。
-5.  **语气基调**: 保持神秘感与权威感。多用"此局"、"命主"、"迹象显示"等术语，但解释必须通俗易懂。
+5.  **语气基调**: 保持权威与克制，不要自称身份，不要寒暄。
 6.  **格式规范**: 使用Markdown输出。
+7.  **禁止寒暄**: 不要出现“你好”“我是”“大师”等自我介绍或问候语。
 
 IMPORTANT: Output the report in Chinese (Simplified).
 

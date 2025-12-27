@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import {
 	astrolabeAtom,
 	isLoadingReportAtom,
@@ -101,14 +102,21 @@ function AppMain() {
 			<IconImage />
 			<PalaceStamp />
 
-			{/* Loading overlay */}
+			{/* Loading screen */}
 			{isLoading && (
-				<div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
-					<div className="border-2 border-foreground px-6 py-5 text-center">
-						<div className="text-xs tracking-[0.3em] text-muted-foreground">
-							正在解析命盘
+				<div className="fixed inset-0 z-[70] bg-background text-foreground">
+					<div className="mx-auto flex h-full w-full max-w-3xl flex-col items-center justify-center px-6">
+						<div className="w-full border-2 border-foreground px-8 py-8">
+							<div className="text-xs tracking-[0.35em] text-muted-foreground">
+								LOADING
+							</div>
+							<div className="mt-3 text-lg tracking-[0.2em]">
+								正在解析命盘
+							</div>
+							<div className="mt-6 h-2 w-full border-2 border-foreground">
+								<div className="h-full w-1/2 animate-pulse bg-foreground" />
+							</div>
 						</div>
-						<div className="mx-auto mt-4 h-8 w-8 animate-spin border-2 border-foreground border-t-transparent" />
 					</div>
 				</div>
 			)}
@@ -140,16 +148,8 @@ function AppMain() {
 						</button>
 					</div>
 					<div className="p-4">
-						<div className="prose prose-sm prose-invert max-w-none">
-							<div
-								className="text-sm leading-relaxed whitespace-pre-wrap"
-								// biome-ignore lint: markdown content
-								dangerouslySetInnerHTML={{
-									__html: currentReport.analysis
-										.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-										.replace(/\n/g, "<br />"),
-								}}
-							/>
+						<div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed">
+							<ReactMarkdown>{currentReport.analysis}</ReactMarkdown>
 						</div>
 					</div>
 				</div>
