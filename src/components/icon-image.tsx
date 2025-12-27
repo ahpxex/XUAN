@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, type TouchEvent } from "react";
 import {
 	currentPalaceIndexAtom,
 	isPalaceAnimatingAtom,
@@ -18,6 +18,9 @@ export function IconImage() {
 	const [direction, setDirection] = useAtom(palaceSwitchDirectionAtom);
 	const setIsAnimating = useSetAtom(isPalaceAnimatingAtom);
 	const isAnimating = useAtomValue(isPalaceAnimatingAtom);
+	const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+	const animatingRef = useRef(false);
+	const swipeThreshold = 32;
 
 	// 计算图片位置，让图片圆和 StarChart 圆相交
 	const imageRight = viewportWidth * (1 - GOLDEN_RATIO) - 48;
@@ -26,31 +29,68 @@ export function IconImage() {
 	const branchName = EARTHLY_BRANCHES[currentIndex];
 	const branchImagePath = `/branches/${branchName}.png`;
 
+	const switchPalace = useCallback(
+		(nextDirection: "up" | "down") => {
+			if (animatingRef.current || isAnimating) return;
+			animatingRef.current = true;
+			setDirection(nextDirection);
+			setIsAnimating(true);
+			setCurrentIndex((prev) => {
+				const delta = nextDirection === "up" ? -1 : 1;
+				return (prev + delta + 12) % 12;
+			});
+			window.setTimeout(() => {
+				setIsAnimating(false);
+				animatingRef.current = false;
+			}, 600);
+		},
+		[isAnimating, setCurrentIndex, setDirection, setIsAnimating],
+	);
+
 	// 键盘事件监听
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.key === "ArrowUp") {
 				e.preventDefault();
-				setDirection("up");
-				setIsAnimating(true);
-				const newIndex = (currentIndex - 1 + 12) % 12;
-				setCurrentIndex(newIndex);
-				// 动画持续时间后重置状态
-				setTimeout(() => setIsAnimating(false), 600);
+				switchPalace("up");
 			} else if (e.key === "ArrowDown") {
 				e.preventDefault();
-				setDirection("down");
-				setIsAnimating(true);
-				const newIndex = (currentIndex + 1) % 12;
-				setCurrentIndex(newIndex);
-				// 动画持续时间后重置状态
-				setTimeout(() => setIsAnimating(false), 600);
+				switchPalace("down");
 			}
 		};
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [currentIndex, setCurrentIndex, setDirection, setIsAnimating]);
+	}, [switchPalace]);
+
+	const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+		if (event.touches.length !== 1) return;
+		const touch = event.touches[0];
+		touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+	};
+
+	const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+		const start = touchStartRef.current;
+		if (!start || event.changedTouches.length === 0) return;
+		const touch = event.changedTouches[0];
+		const deltaX = touch.clientX - start.x;
+		const deltaY = touch.clientY - start.y;
+		touchStartRef.current = null;
+
+		if (Math.abs(deltaY) < swipeThreshold || Math.abs(deltaY) < Math.abs(deltaX)) {
+			return;
+		}
+
+		if (deltaY < 0) {
+			switchPalace("up");
+		} else {
+			switchPalace("down");
+		}
+	};
+
+	const handleTouchCancel = () => {
+		touchStartRef.current = null;
+	};
 
 	// 动画变体 - 抛物线轨迹
 	const variants = {
@@ -77,7 +117,11 @@ export function IconImage() {
 			style={{
 				right: `${imageRight}px`,
 				backgroundColor: isAnimating ? "transparent" : "black",
+				touchAction: "none",
 			}}
+			onTouchStart={handleTouchStart}
+			onTouchEnd={handleTouchEnd}
+			onTouchCancel={handleTouchCancel}
 		>
 			{/* 固定的容器背景图片 - 也参与动画 */}
 			<AnimatePresence initial={false} custom={direction} mode="wait">
