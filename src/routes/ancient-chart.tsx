@@ -2,7 +2,11 @@ import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useMemo, useRef } from "react";
-import { GOLDEN_RATIO, switchDirectionAtom, viewportWidthAtom } from "../atoms/viewport";
+import {
+	currentPalaceIndexAtom,
+	palaceSwitchDirectionAtom,
+} from "../atoms/palace";
+import { GOLDEN_RATIO, viewportWidthAtom } from "../atoms/viewport";
 
 // --- 配置区域 ---
 const ANCIENT_TEXT_RAW =
@@ -18,15 +22,11 @@ interface Star {
 	opacity: number;
 }
 
-interface AncientStarChartProps {
-	currentIndex: number;
-}
-
-export const AncientStarChart: React.FC<AncientStarChartProps> = ({ currentIndex }) => {
-	const containerRef = useRef<HTMLDivElement>(null);
+export const AncientStarChart: React.FC = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [viewportWidth, setViewportWidth] = useAtom(viewportWidthAtom);
-	const direction = useAtomValue(switchDirectionAtom);
+	const direction = useAtomValue(palaceSwitchDirectionAtom);
+	const currentIndex = useAtomValue(currentPalaceIndexAtom);
 
 	// 监听窗口大小变化并在组件挂载时立即设置
 	useEffect(() => {

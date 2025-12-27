@@ -34,6 +34,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang="en" className="dark">
 			<head>
 				<HeadContent />
+				{process.env.NODE_ENV === "development" && (
+					<script
+						src="//unpkg.com/react-grab/dist/index.global.js"
+						crossOrigin="anonymous"
+						defer
+					></script>
+				)}
 			</head>
 			<body>
 				{children}

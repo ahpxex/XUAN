@@ -1,10 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAtomValue } from "jotai";
-import { useState } from "react";
-import { EARTHLY_BRANCHES } from "../atoms/viewport";
-import { birthInfoAtom, astrolabeAtom } from "../atoms/ziwei";
+import { createFileRoute } from "@tanstack/react-router";
 import { IconImage } from "../components/icon-image";
-import { SealStamp } from "../components/seal-stamp";
+import { PalaceStamp } from "../components/palace-stamp";
 import StarChart from "./ancient-chart";
 
 export const Route = createFileRoute("/app")({
