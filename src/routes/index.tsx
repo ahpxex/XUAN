@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
-import LoadingOverlay from "@/components/loading-overlay";
 import {
 	astrolabeAtom,
 	isLoadingReportAtom,
@@ -11,6 +10,7 @@ import {
 } from "../atoms/ziwei";
 import { generateAstrolabe } from "../lib/astrolabe";
 import { generateRandomUserData, isDevelopment } from "../lib/dev-utils";
+import LoadingOverlay from "@/components/loading-overlay";
 
 export const Route = createFileRoute("/")({ component: App });
 

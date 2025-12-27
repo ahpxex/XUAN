@@ -19,10 +19,7 @@ interface LoadingOverlayProps {
 	text?: string;
 }
 
-const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
-	isLoading = true,
-	text = "LOADING",
-}) => {
+const LoadingOverlay = ({ isLoading = true, text = "LOADING" }) => {
 	const trails: StarTrail[] = useMemo(() => {
 		const count = 80;
 		const radiusScale = d3.scaleLinear().domain([0, count]).range([50, 800]);
@@ -56,7 +53,7 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 			{isLoading && (
 				<motion.div
 					key="loading-overlay" // 3. 必须添加唯一的 key
-					className="fixed inset-0 z-50 flex items-center justify-center bg-black overflow-hidden"
+					className="fixed inset-0 z-99 flex items-center justify-center bg-black overflow-hidden"
 					// 4. 添加进出场动画，解决 DOM 移除冲突
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
@@ -117,4 +114,4 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
 	);
 };
 
-export { LoadingOverlay };
+export default LoadingOverlay;
