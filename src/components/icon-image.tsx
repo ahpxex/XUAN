@@ -53,17 +53,20 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [index, onIndexChange, setDirection, setIsAnimating]);
 
-	// 动画变体
+	// 动画变体 - 抛物线轨迹
 	const variants = {
 		enter: (direction: string) => ({
+			x: direction === "up" ? 80 : -80,
 			y: direction === "up" ? 100 : -100,
 			opacity: 0,
 		}),
 		center: {
+			x: 0,
 			y: 0,
 			opacity: 0.8,
 		},
 		exit: (direction: string) => ({
+			x: direction === "up" ? -80 : 80,
 			y: direction === "up" ? -100 : 100,
 			opacity: 0,
 		}),
@@ -91,7 +94,8 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 					animate="center"
 					exit="exit"
 					transition={{
-						y: { type: "spring", stiffness: 300, damping: 30 },
+						x: { type: "spring", stiffness: 200, damping: 25 },
+						y: { type: "spring", stiffness: 250, damping: 30 },
 						opacity: { duration: 0.2 },
 					}}
 				/>
@@ -110,7 +114,8 @@ export function IconImage({ index, onIndexChange }: IconImageProps) {
 					animate="center"
 					exit="exit"
 					transition={{
-						y: { type: "spring", stiffness: 300, damping: 30 },
+						x: { type: "spring", stiffness: 200, damping: 25 },
+						y: { type: "spring", stiffness: 250, damping: 30 },
 						opacity: { duration: 0.2 },
 					}}
 				/>
