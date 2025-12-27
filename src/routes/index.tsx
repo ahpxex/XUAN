@@ -117,7 +117,7 @@ function App() {
 			{/* Header */}
 			<header className="border-b border-border p-6">
 				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">
-					xuan
+					XUAN
 				</h1>
 			</header>
 
