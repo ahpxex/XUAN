@@ -105,11 +105,13 @@ function App() {
 		}
 	};
 
+	// 如果正在导航，只显示 LoadingOverlay
+	if (isNavigating) {
+		return <LoadingOverlay isLoading={true} text="正在解析命盘" />;
+	}
+
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
-			{/* Loading Overlay */}
-			<LoadingOverlay isLoading={isNavigating} text="正在解析命盘" />
-
 			{/* Header */}
 			<header className="border-b border-border p-6">
 				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">

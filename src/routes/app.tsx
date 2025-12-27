@@ -10,7 +10,7 @@ import {
 } from "../atoms/ziwei";
 import { IconImage } from "../components/icon-image";
 import { PalaceStamp } from "../components/palace-stamp";
-import { LoadingOverlay } from "../components/loading-overlay";
+import LoadingOverlay from "../components/loading-overlay";
 import { currentPalaceIndexAtom } from "../atoms/palace";
 import { analyzePalaces, formDataToBirthInfo } from "../lib/api";
 import { astrolabeToJSON, generateAstrolabe } from "../lib/astrolabe";
@@ -148,14 +148,16 @@ function AppMain() {
 		(report) => report.index === currentPalaceIndex,
 	);
 
+	// 如果正在加载，只显示 LoadingOverlay
+	if (isLoading) {
+		return <LoadingOverlay isLoading={true} text="正在解析命盘" />;
+	}
+
 	return (
 		<div className="relative min-h-screen bg-background text-foreground overflow-hidden">
 			<StarChart />
 			<IconImage />
 			<PalaceStamp />
-
-			{/* Loading screen */}
-			<LoadingOverlay isLoading={isLoading} text="正在解析命盘" />
 
 			{/* Toggle button for report panel */}
 			{currentReport && !showReport && (
