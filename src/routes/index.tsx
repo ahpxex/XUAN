@@ -287,12 +287,15 @@ function App() {
 							if (step < totalSteps) {
 								setStep((s) => s + 1);
 							} else {
+								console.log("[Form] Submitting form data:", formData);
 								// Store form data in atom
 								setUserForm(formData);
 								// Generate astrolabe using iztro
 								const astrolabe = generateAstrolabe(formData);
+								console.log("[Form] Generated astrolabe:", astrolabe);
 								setAstrolabe(astrolabe);
 								// Navigate to app
+								console.log("[Form] Navigating to /app");
 								navigate({ to: "/app" });
 							}
 						}}

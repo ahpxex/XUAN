@@ -23,6 +23,16 @@ export interface AstrolabeResponse {
 	report?: string;
 }
 
+export interface PalaceReport {
+	name: string;
+	index: number;
+	analysis: string;
+}
+
+export interface PalaceAnalysisResponse {
+	palaces: PalaceReport[];
+}
+
 /**
  * Convert UserFormData to BirthInfo for API
  */
@@ -61,4 +71,38 @@ export async function submitAstrolabe(
 	}
 
 	return response.json();
+}
+
+/**
+ * Analyze all 12 palaces and get detailed reports
+ */
+export async function analyzePalaces(
+	birthInfo: BirthInfo,
+	astrolabe: object,
+): Promise<PalaceAnalysisResponse> {
+	const url = `${API_BASE}/ziwei/analyze-palaces`;
+	console.log("[API] analyzePalaces called", { url, birthInfo });
+
+	const response = await fetch(url, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			birthInfo,
+			astrolabe,
+		}),
+	});
+
+	console.log("[API] Response status:", response.status, response.statusText);
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		console.error("[API] Error response:", errorText);
+		throw new Error(`API error: ${response.status} - ${errorText}`);
+	}
+
+	const data = await response.json();
+	console.log("[API] Response data:", data);
+	return data;
 }

@@ -4,6 +4,7 @@ from app.config import Settings, get_settings
 from app.services.ingestion_service import IngestionService
 from app.services.llm_service import LLMService
 from app.services.rag_service import RAGService
+from app.services.ziwei_rag import ZiweiRAGService
 
 
 @lru_cache
@@ -28,4 +29,9 @@ def get_rag_service() -> RAGService:
         ingestion_service=get_ingestion_service(),
         llm_service=get_llm_service(),
     )
+
+
+@lru_cache
+def get_ziwei_rag_service() -> ZiweiRAGService:
+    return ZiweiRAGService()
 

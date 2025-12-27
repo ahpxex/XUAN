@@ -1,6 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import type { FunctionalAstrolabe } from "iztro/lib/astro/FunctionalAstrolabe";
+import type { PalaceReport } from "../lib/api";
 
 export interface UserFormData {
 	name: string;
@@ -20,8 +21,11 @@ export const userFormAtom = atomWithStorage<UserFormData | null>(
 // Store computed astrolabe from iztro (not persisted - regenerated from form data)
 export const astrolabeAtom = atom<FunctionalAstrolabe | null>(null);
 
-// Store AI report from backend
+// Store AI report from backend (simple overview)
 export const aiReportAtom = atom<string | null>(null);
+
+// Store palace reports from backend (detailed 12 palace analysis)
+export const palaceReportsAtom = atom<PalaceReport[]>([]);
 
 // Loading state for API calls
 export const isLoadingReportAtom = atom(false);
