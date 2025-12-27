@@ -10,6 +10,7 @@ import {
 } from "../atoms/ziwei";
 import { IconImage } from "../components/icon-image";
 import { PalaceStamp } from "../components/palace-stamp";
+import { LoadingOverlay } from "../components/loading-overlay";
 import { currentPalaceIndexAtom } from "../atoms/palace";
 import { analyzePalaces, formDataToBirthInfo } from "../lib/api";
 import { astrolabeToJSON, generateAstrolabe } from "../lib/astrolabe";
@@ -137,23 +138,7 @@ function AppMain() {
 			<PalaceStamp />
 
 			{/* Loading screen */}
-			{isLoading && (
-				<div className="fixed inset-0 z-[70] bg-background text-foreground">
-					<div className="mx-auto flex h-full w-full max-w-3xl flex-col items-center justify-center px-6">
-						<div className="w-full border-2 border-foreground px-8 py-8">
-							<div className="text-xs tracking-[0.35em] text-muted-foreground">
-								LOADING
-							</div>
-							<div className="mt-3 text-lg tracking-[0.2em]">
-								正在解析命盘
-							</div>
-							<div className="mt-6 h-2 w-full border-2 border-foreground">
-								<div className="h-full w-1/2 animate-pulse bg-foreground" />
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
+			{isLoading && <LoadingOverlay />}
 
 			{/* Toggle button for report panel */}
 			{currentReport && !showReport && (

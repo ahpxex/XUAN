@@ -10,6 +10,7 @@ import {
 } from "../atoms/ziwei";
 import { generateAstrolabe } from "../lib/astrolabe";
 import { generateRandomUserData, isDevelopment } from "../lib/dev-utils";
+import { LoadingOverlay } from "../components/loading-overlay";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -39,6 +40,7 @@ function App() {
 	const setIsLoading = useSetAtom(isLoadingReportAtom);
 	const [step, setStep] = useState(1);
 	const [flowType, setFlowType] = useState<"divination" | "question" | null>(null);
+	const [isNavigating, setIsNavigating] = useState(false);
 	const [formData, setFormData] = useState<UserFormData>({
 		name: "",
 		gender: "",
@@ -81,29 +83,31 @@ function App() {
 		return true;
 	};
 
-	const totalSteps = 3;
+	const totalSteps = 2;
 
-	// Auto-submit and navigate when reaching step 3
-	useEffect(() => {
-		if (step === 3) {
-			const timer = setTimeout(() => {
-				console.log("[Form] Submitting form data:", formData);
-				setIsLoading(false);
-				setPalaceReports([]);
-				setUserForm(formData);
-				const astrolabe = generateAstrolabe(formData);
-				console.log("[Form] Generated astrolabe:", astrolabe);
-				setAstrolabe(astrolabe);
-				console.log("[Form] Navigating to /app");
-				navigate({ to: "/app" });
-			}, 2000);
-
-			return () => clearTimeout(timer);
+	const handleContinue = () => {
+		if (step === 1) {
+			setStep(2);
+		} else if (step === 2) {
+			// Trigger loading and navigate
+			setIsNavigating(true);
+			console.log("[Form] Submitting form data:", formData);
+			setIsLoading(false);
+			setPalaceReports([]);
+			setUserForm(formData);
+			const astrolabe = generateAstrolabe(formData);
+			console.log("[Form] Generated astrolabe:", astrolabe);
+			setAstrolabe(astrolabe);
+			console.log("[Form] Navigating to /app");
+			navigate({ to: "/app" });
 		}
-	}, [step, formData, navigate, setUserForm, setAstrolabe, setIsLoading, setPalaceReports]);
+	};
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
+			{/* Loading Overlay */}
+			{isNavigating && <LoadingOverlay />}
+
 			{/* Header */}
 			<header className="border-b border-border p-6">
 				<h1 className="text-sm tracking-[0.3em] uppercase text-muted-foreground">
@@ -308,31 +312,6 @@ function App() {
 						</div>
 					</div>
 				)}
-
-				{step === 3 && (
-					<div className="space-y-8">
-						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] text-muted-foreground">
-								步骤 03
-							</span>
-							<h2 className="text-2xl font-light">正在生成</h2>
-						</div>
-
-						<div className="space-y-6">
-							<div className="border-2 border-foreground px-8 py-8">
-								<div className="text-xs tracking-[0.35em] text-muted-foreground">
-									LOADING
-								</div>
-								<div className="mt-3 text-lg tracking-[0.2em]">
-									正在解析命盘
-								</div>
-								<div className="mt-6 h-2 w-full border-2 border-foreground">
-									<div className="h-full w-1/2 animate-pulse bg-foreground" />
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
 			</main>
 
 			{/* Navigation */}
@@ -341,7 +320,7 @@ function App() {
 					<button
 						type="button"
 						onClick={() => setStep((s) => Math.max(1, s - 1))}
-						disabled={step === 1 || step === 3}
+						disabled={step === 1}
 						className="text-sm tracking-wide text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
 						返回
@@ -351,26 +330,14 @@ function App() {
 						{step} / {totalSteps}
 					</span>
 
-					{step < 3 && (
-						<button
-							type="button"
-							onClick={() => {
-								if (step < totalSteps) {
-									setStep((s) => s + 1);
-								}
-							}}
-							disabled={!canProceed()}
-							className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-						>
-							继续
-						</button>
-					)}
-
-					{step === 3 && (
-						<div className="px-8 py-3 text-sm tracking-wide text-muted-foreground">
-							加载中...
-						</div>
-					)}
+					<button
+						type="button"
+						onClick={handleContinue}
+						disabled={!canProceed()}
+						className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+					>
+						继续
+					</button>
 				</div>
 			</footer>
 		</div>
