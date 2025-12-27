@@ -1,8 +1,8 @@
-interface SealStampProps {
+interface PalaceStampProps {
 	text: string;
 }
 
-export function SealStamp({ text }: SealStampProps) {
+export function PalaceStamp({ text }: PalaceStampProps) {
 	return (
 		<div className="absolute top-8 right-8 z-[60]">
 			<div className="border-2 border-white px-6 py-8 flex flex-col items-center">
