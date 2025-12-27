@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	astrolabeAtom,
 	isLoadingReportAtom,
@@ -37,6 +37,7 @@ function App() {
 	const setPalaceReports = useSetAtom(palaceReportsAtom);
 	const setIsLoading = useSetAtom(isLoadingReportAtom);
 	const [step, setStep] = useState(1);
+	const [flowType, setFlowType] = useState<"divination" | "question" | null>(null);
 	const [formData, setFormData] = useState<UserFormData>({
 		name: "",
 		gender: "",
@@ -52,6 +53,9 @@ function App() {
 
 	const canProceed = () => {
 		if (step === 1) {
+			return flowType !== null;
+		}
+		if (step === 2) {
 			return (
 				formData.name.trim() !== "" &&
 				formData.gender !== "" &&
@@ -65,6 +69,25 @@ function App() {
 	};
 
 	const totalSteps = 3;
+
+	// Auto-submit and navigate when reaching step 3
+	useEffect(() => {
+		if (step === 3) {
+			const timer = setTimeout(() => {
+				console.log("[Form] Submitting form data:", formData);
+				setIsLoading(false);
+				setPalaceReports([]);
+				setUserForm(formData);
+				const astrolabe = generateAstrolabe(formData);
+				console.log("[Form] Generated astrolabe:", astrolabe);
+				setAstrolabe(astrolabe);
+				console.log("[Form] Navigating to /app");
+				navigate({ to: "/app" });
+			}, 2000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [step, formData, navigate, setUserForm, setAstrolabe, setIsLoading, setPalaceReports]);
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -94,6 +117,42 @@ function App() {
 						<div className="space-y-2">
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 01
+							</span>
+							<h2 className="text-2xl font-light">选择服务</h2>
+						</div>
+
+						<div className="flex gap-4">
+							<button
+								type="button"
+								onClick={() => setFlowType("divination")}
+								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${
+									flowType === "divination"
+										? "border-foreground bg-foreground text-background"
+										: "border-border hover:border-muted-foreground"
+								}`}
+							>
+								占卜叫
+							</button>
+							<button
+								type="button"
+								onClick={() => setFlowType("question")}
+								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${
+									flowType === "question"
+										? "border-foreground bg-foreground text-background"
+										: "border-border hover:border-muted-foreground"
+								}`}
+							>
+								每问事
+							</button>
+						</div>
+					</div>
+				)}
+
+				{step === 2 && (
+					<div className="space-y-8">
+						<div className="space-y-2">
+							<span className="text-xs tracking-[0.2em] text-muted-foreground">
+								步骤 02
 							</span>
 							<h2 className="text-2xl font-light">基本信息</h2>
 						</div>
@@ -224,45 +283,26 @@ function App() {
 					</div>
 				)}
 
-				{step === 2 && (
-					<div className="space-y-8">
-						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] text-muted-foreground">
-								步骤 02
-							</span>
-							<h2 className="text-2xl font-light">内容待定</h2>
-							<p className="text-sm text-muted-foreground">
-								此步骤的内容将在后续开发中完善
-							</p>
-						</div>
-
-						<div className="space-y-6">
-							<div className="border-2 border-dashed border-border p-12 text-center">
-								<p className="text-sm text-muted-foreground tracking-wide">
-									PLACEHOLDER
-								</p>
-							</div>
-						</div>
-					</div>
-				)}
-
 				{step === 3 && (
 					<div className="space-y-8">
 						<div className="space-y-2">
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 03
 							</span>
-							<h2 className="text-2xl font-light">内容待定</h2>
-							<p className="text-sm text-muted-foreground">
-								此步骤的内容将在后续开发中完善
-							</p>
+							<h2 className="text-2xl font-light">正在生成</h2>
 						</div>
 
 						<div className="space-y-6">
-							<div className="border-2 border-dashed border-border p-12 text-center">
-								<p className="text-sm text-muted-foreground tracking-wide">
-									PLACEHOLDER
-								</p>
+							<div className="border-2 border-foreground px-8 py-8">
+								<div className="text-xs tracking-[0.35em] text-muted-foreground">
+									LOADING
+								</div>
+								<div className="mt-3 text-lg tracking-[0.2em]">
+									正在解析命盘
+								</div>
+								<div className="mt-6 h-2 w-full border-2 border-foreground">
+									<div className="h-full w-1/2 animate-pulse bg-foreground" />
+								</div>
 							</div>
 						</div>
 					</div>
@@ -275,7 +315,7 @@ function App() {
 					<button
 						type="button"
 						onClick={() => setStep((s) => Math.max(1, s - 1))}
-						disabled={step === 1}
+						disabled={step === 1 || step === 3}
 						className="text-sm tracking-wide text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
 						返回
@@ -285,31 +325,26 @@ function App() {
 						{step} / {totalSteps}
 					</span>
 
-					<button
-						type="button"
-						onClick={() => {
-							if (step < totalSteps) {
-								setStep((s) => s + 1);
-							} else {
-								console.log("[Form] Submitting form data:", formData);
-								setIsLoading(false);
-								setPalaceReports([]);
-								// Store form data in atom
-								setUserForm(formData);
-								// Generate astrolabe using iztro
-								const astrolabe = generateAstrolabe(formData);
-								console.log("[Form] Generated astrolabe:", astrolabe);
-								setAstrolabe(astrolabe);
-								// Navigate to app
-								console.log("[Form] Navigating to /app");
-								navigate({ to: "/app" });
-							}
-						}}
-						disabled={!canProceed()}
-						className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-					>
-						{step === totalSteps ? "完成" : "继续"}
-					</button>
+					{step < 3 && (
+						<button
+							type="button"
+							onClick={() => {
+								if (step < totalSteps) {
+									setStep((s) => s + 1);
+								}
+							}}
+							disabled={!canProceed()}
+							className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+						>
+							继续
+						</button>
+					)}
+
+					{step === 3 && (
+						<div className="px-8 py-3 text-sm tracking-wide text-muted-foreground">
+							加载中...
+						</div>
+					)}
 				</div>
 			</footer>
 		</div>
