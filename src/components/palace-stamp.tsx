@@ -70,7 +70,7 @@ export function PalaceStamp() {
 				{stars.length > 0 && (
 					<motion.div
 						key={`stars-${currentIndex}`}
-						className="flex flex-row-reverse flex-nowrap gap-4"
+						className="hidden md:flex flex-row-reverse flex-nowrap gap-4"
 						custom={direction}
 						variants={variants}
 						initial="enter"

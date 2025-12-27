@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type TouchEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import {
 	astrolabeAtom,
@@ -11,7 +11,11 @@ import {
 import { IconImage } from "../components/icon-image";
 import { PalaceStamp } from "../components/palace-stamp";
 import LoadingOverlay from "../components/loading-overlay";
-import { currentPalaceIndexAtom } from "../atoms/palace";
+import {
+	currentPalaceIndexAtom,
+	isPalaceAnimatingAtom,
+	palaceSwitchDirectionAtom,
+} from "../atoms/palace";
 import { analyzePalaces, formDataToBirthInfo } from "../lib/api";
 import { astrolabeToJSON, generateAstrolabe } from "../lib/astrolabe";
 import StarChart from "./ancient-chart";
@@ -34,10 +38,17 @@ function AppMain() {
 	const [palaceReports, setPalaceReports] = useAtom(palaceReportsAtom);
 	const [isLoading, setIsLoading] = useAtom(isLoadingReportAtom);
 	const [currentPalaceIndex, setCurrentPalaceIndex] = useAtom(currentPalaceIndexAtom);
+	const setPalaceDirection = useSetAtom(palaceSwitchDirectionAtom);
+	const isAnimating = useAtomValue(isPalaceAnimatingAtom);
+	const setIsAnimating = useSetAtom(isPalaceAnimatingAtom);
 	const [showReport, setShowReport] = useState(false);
 	const inFlightRef = useRef(false);
 	const abortRef = useRef<AbortController | null>(null);
 	const isActiveRef = useRef(true);
+	const animatingRef = useRef(false);
+	const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+	const reportPanelRef = useRef<HTMLDivElement | null>(null);
+	const swipeThreshold = 32;
 
 	console.log("[App] Component rendered", {
 		hasUserForm: !!userForm,
@@ -149,6 +160,76 @@ function AppMain() {
 		setIsLoading,
 	]);
 
+	const switchPalace = useCallback(
+		(nextDirection: "up" | "down") => {
+			if (animatingRef.current || isAnimating) return;
+			animatingRef.current = true;
+			setPalaceDirection(nextDirection);
+			setIsAnimating(true);
+			setCurrentPalaceIndex((prev) => {
+				const delta = nextDirection === "up" ? -1 : 1;
+				return (prev + delta + 12) % 12;
+			});
+			window.setTimeout(() => {
+				setIsAnimating(false);
+				animatingRef.current = false;
+			}, 600);
+		},
+		[isAnimating, setCurrentPalaceIndex, setIsAnimating, setPalaceDirection],
+	);
+
+	const isTouchInsideReport = (target: EventTarget | null) => {
+		if (!showReport || !target || !reportPanelRef.current) return false;
+		return reportPanelRef.current.contains(target as Node);
+	};
+
+	// 键盘事件监听
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "ArrowUp") {
+				e.preventDefault();
+				switchPalace("up");
+			} else if (e.key === "ArrowDown") {
+				e.preventDefault();
+				switchPalace("down");
+			}
+		};
+
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [switchPalace]);
+
+	const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+		if (event.touches.length !== 1) return;
+		if (isTouchInsideReport(event.target)) return;
+		const touch = event.touches[0];
+		touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+	};
+
+	const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+		if (isTouchInsideReport(event.target)) return;
+		const start = touchStartRef.current;
+		if (!start || event.changedTouches.length === 0) return;
+		const touch = event.changedTouches[0];
+		const deltaX = touch.clientX - start.x;
+		const deltaY = touch.clientY - start.y;
+		touchStartRef.current = null;
+
+		if (Math.abs(deltaY) < swipeThreshold || Math.abs(deltaY) < Math.abs(deltaX)) {
+			return;
+		}
+
+		if (deltaY < 0) {
+			switchPalace("up");
+		} else {
+			switchPalace("down");
+		}
+	};
+
+	const handleTouchCancel = () => {
+		touchStartRef.current = null;
+	};
+
 	// Get the current palace report based on index
 	const currentReport = palaceReports.find(
 		(report) => report.index === currentPalaceIndex,
@@ -160,7 +241,12 @@ function AppMain() {
 	}
 
 	return (
-		<div className="relative min-h-screen bg-background text-foreground overflow-hidden">
+		<div
+			className="relative min-h-screen bg-background text-foreground overflow-hidden"
+			onTouchStart={handleTouchStart}
+			onTouchEnd={handleTouchEnd}
+			onTouchCancel={handleTouchCancel}
+		>
 			<StarChart />
 			<IconImage />
 			<PalaceStamp />
@@ -178,7 +264,10 @@ function AppMain() {
 
 			{/* Palace Report Panel */}
 			{showReport && currentReport && (
-				<div className="fixed inset-y-0 left-0 w-full max-w-md bg-background/95 backdrop-blur border-r border-border overflow-y-auto z-50">
+				<div
+					ref={reportPanelRef}
+					className="fixed inset-y-0 left-0 w-full max-w-md bg-background/95 backdrop-blur border-r border-border overflow-y-auto z-50"
+				>
 					<div className="sticky top-0 flex items-center justify-between p-4 bg-background/95 backdrop-blur border-b border-border">
 						<h3 className="text-xs tracking-[0.15em] text-muted-foreground">
 							{currentReport.name}
