@@ -26,15 +26,6 @@ function AppMain() {
 	const currentPalaceIndex = useAtomValue(currentPalaceIndexAtom);
 	const [showReport, setShowReport] = useState(false);
 
-	// Regenerate astrolabe from userForm if it's not set (e.g., after page refresh)
-	useEffect(() => {
-		if (userForm && !astrolabe) {
-			console.log("[App] Regenerating astrolabe from userForm");
-			const newAstrolabe = generateAstrolabe(userForm);
-			setAstrolabe(newAstrolabe);
-		}
-	}, [userForm, astrolabe, setAstrolabe]);
-
 	console.log("[App] Component rendered", {
 		hasUserForm: !!userForm,
 		hasAstrolabe: !!astrolabe,
@@ -43,20 +34,20 @@ function AppMain() {
 	});
 
 	useEffect(() => {
+		const hasReports = palaceReports.length > 0;
 		console.log("[App] useEffect triggered", {
 			hasUserForm: !!userForm,
 			hasAstrolabe: !!astrolabe,
-			palaceReportsCount: palaceReports.length,
+			hasReports,
 			isLoading,
 		});
 
 		// Skip if no data, already loading, or already have reports
-		if (!userForm || !astrolabe || isLoading || palaceReports.length > 0) {
+		if (!userForm || isLoading || hasReports) {
 			console.log("[App] Skipping API call - conditions not met", {
 				noUserForm: !userForm,
-				noAstrolabe: !astrolabe,
 				isLoading,
-				hasReports: palaceReports.length > 0,
+				hasReports,
 			});
 			return;
 		}
@@ -65,9 +56,14 @@ function AppMain() {
 			console.log("[App] Starting fetchReports...");
 			setIsLoading(true);
 			try {
+				const resolvedAstrolabe =
+					astrolabe ?? generateAstrolabe(userForm);
+				if (!astrolabe) {
+					setAstrolabe(resolvedAstrolabe);
+				}
 				const birthInfo = formDataToBirthInfo(userForm);
 				console.log("[App] Birth info:", birthInfo);
-				const astrolabeData = astrolabeToJSON(astrolabe);
+				const astrolabeData = astrolabeToJSON(resolvedAstrolabe);
 				console.log("[App] Astrolabe data (keys):", Object.keys(astrolabeData));
 				console.log("[App] Calling analyzePalaces API...");
 				const response = await analyzePalaces(birthInfo, astrolabeData);
@@ -84,7 +80,15 @@ function AppMain() {
 		};
 
 		fetchReports();
-	}, [userForm, astrolabe, palaceReports, isLoading, setPalaceReports, setIsLoading]);
+	}, [
+		userForm,
+		astrolabe,
+		palaceReports.length,
+		isLoading,
+		setAstrolabe,
+		setPalaceReports,
+		setIsLoading,
+	]);
 
 	// Get the current palace report based on index
 	const currentReport = palaceReports.find(
@@ -97,10 +101,15 @@ function AppMain() {
 			<IconImage />
 			<PalaceStamp />
 
-			{/* Loading indicator */}
+			{/* Loading overlay */}
 			{isLoading && (
-				<div className="fixed bottom-6 left-6 text-xs text-muted-foreground tracking-wide">
-					AI analyzing palaces...
+				<div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/90 backdrop-blur-sm">
+					<div className="border-2 border-foreground px-6 py-5 text-center">
+						<div className="text-xs tracking-[0.3em] text-muted-foreground">
+							正在解析命盘
+						</div>
+						<div className="mx-auto mt-4 h-8 w-8 animate-spin border-2 border-foreground border-t-transparent" />
+					</div>
 				</div>
 			)}
 

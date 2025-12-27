@@ -3,6 +3,8 @@ import { useSetAtom } from "jotai";
 import { useState } from "react";
 import {
 	astrolabeAtom,
+	isLoadingReportAtom,
+	palaceReportsAtom,
 	userFormAtom,
 	type UserFormData,
 } from "../atoms/ziwei";
@@ -32,6 +34,8 @@ function App() {
 	const navigate = useNavigate();
 	const setUserForm = useSetAtom(userFormAtom);
 	const setAstrolabe = useSetAtom(astrolabeAtom);
+	const setPalaceReports = useSetAtom(palaceReportsAtom);
+	const setIsLoading = useSetAtom(isLoadingReportAtom);
 	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState<UserFormData>({
 		name: "",
@@ -288,6 +292,8 @@ function App() {
 								setStep((s) => s + 1);
 							} else {
 								console.log("[Form] Submitting form data:", formData);
+								setIsLoading(false);
+								setPalaceReports([]);
 								// Store form data in atom
 								setUserForm(formData);
 								// Generate astrolabe using iztro
