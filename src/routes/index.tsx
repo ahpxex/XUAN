@@ -1,16 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useSetAtom } from "jotai";
 import { useState } from "react";
+import {
+	astrolabeAtom,
+	userFormAtom,
+	type UserFormData,
+} from "../atoms/ziwei";
+import { generateAstrolabe } from "../lib/astrolabe";
 
 export const Route = createFileRoute("/")({ component: App });
-
-interface FormData {
-	name: string;
-	gender: string;
-	birthYear: string;
-	birthMonth: string;
-	birthDay: string;
-	birthShichen: string;
-}
 
 const SHICHEN = [
 	{ label: "子时", value: "zi", time: "23:00-01:00" },
@@ -32,8 +30,10 @@ const YEARS = Array.from({ length: 100 }, (_, i) =>
 
 function App() {
 	const navigate = useNavigate();
+	const setUserForm = useSetAtom(userFormAtom);
+	const setAstrolabe = useSetAtom(astrolabeAtom);
 	const [step, setStep] = useState(1);
-	const [formData, setFormData] = useState<FormData>({
+	const [formData, setFormData] = useState<UserFormData>({
 		name: "",
 		gender: "",
 		birthYear: "",
@@ -42,7 +42,7 @@ function App() {
 		birthShichen: "",
 	});
 
-	const updateField = (field: keyof FormData, value: string) => {
+	const updateField = (field: keyof UserFormData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
 
@@ -287,6 +287,12 @@ function App() {
 							if (step < totalSteps) {
 								setStep((s) => s + 1);
 							} else {
+								// Store form data in atom
+								setUserForm(formData);
+								// Generate astrolabe using iztro
+								const astrolabe = generateAstrolabe(formData);
+								setAstrolabe(astrolabe);
+								// Navigate to app
 								navigate({ to: "/app" });
 							}
 						}}
