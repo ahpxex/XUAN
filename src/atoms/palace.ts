@@ -1,5 +1,6 @@
 import { atom } from "jotai";
-import { astrolabeAtom } from "./ziwei";
+import { astrolabeAtom, palaceReportsAtom } from "./ziwei";
+import { STAR_DESCRIPTIONS } from "../lib/star-descriptions";
 
 export interface Star {
 	name: string;
@@ -40,36 +41,63 @@ export const currentPalaceAtom = atom((get) => {
 	};
 });
 
-// 派生 atom：当前宫位名称
+// 派生 atom：当前宫位名称（从 palaceReports 获取）
 export const currentPalaceNameAtom = atom((get) => {
-	return get(currentPalaceAtom).name;
+	const currentIndex = get(currentPalaceIndexAtom);
+	const palaceReports = get(palaceReportsAtom);
+
+	// 从 palaceReports 中找到对应的报告
+	const report = palaceReports.find((r) => r.index === currentIndex);
+	return report?.name || "未知";
 });
 
 // 派生 atom：当前宫位星曜（从 astrolabe 获取）
 export const currentPalaceStarsAtom = atom((get) => {
-	const index = get(currentPalaceIndexAtom);
+	const currentIndex = get(currentPalaceIndexAtom);
 	const astrolabe = get(astrolabeAtom);
+	const palaceReports = get(palaceReportsAtom);
 
-	if (!astrolabe || !astrolabe.palaces || !astrolabe.palaces[index]) {
+	if (!astrolabe || !astrolabe.palaces) {
 		return [];
 	}
 
-	const palace = astrolabe.palaces[index];
+	// 从 palaceReports 中获取当前宫位的名称
+	const currentReport = palaceReports.find((r) => r.index === currentIndex);
+	if (!currentReport) {
+		return [];
+	}
+
+	// 通过宫位名称在 astrolabe 中查找对应的宫位
+	const palace = astrolabe.palaces.find((p) => p.name === currentReport.name);
+	if (!palace) {
+		return [];
+	}
+
 	const stars: Star[] = [];
 
-	// 从 astrolabe 中提取主星
+	// 只提取主星，并添加说明
 	if (palace.majorStars && Array.isArray(palace.majorStars)) {
 		for (const star of palace.majorStars) {
 			if (star.name) {
+				// 获取星的说明
+				const description = STAR_DESCRIPTIONS[star.name] || "";
+
+				// 组合亮度和说明
+				const brightnessAndMutagen = [star.brightness, star.mutagen]
+					.filter(Boolean)
+					.join("");
+
+				const properties = brightnessAndMutagen
+					? `${brightnessAndMutagen} ${description}`
+					: description;
+
 				stars.push({
 					name: star.name,
-					properties: star.brightness || "",
+					properties: properties.trim(),
 				});
 			}
 		}
 	}
-
-	// 可以根据需要添加辅星等其他星曜
 
 	return stars;
 });
