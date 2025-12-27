@@ -9,6 +9,7 @@ import {
 	type UserFormData,
 } from "../atoms/ziwei";
 import { generateAstrolabe } from "../lib/astrolabe";
+import { generateRandomUserData, isDevelopment } from "../lib/dev-utils";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -50,6 +51,18 @@ function App() {
 	const updateField = (field: keyof UserFormData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 	};
+
+	const autoFillForm = () => {
+		const randomData = generateRandomUserData();
+		setFormData(randomData);
+	};
+
+	// Auto-fill form in development when entering step 2
+	useEffect(() => {
+		if (isDevelopment() && step === 2 && formData.name === "") {
+			autoFillForm();
+		}
+	}, [step]);
 
 	const canProceed = () => {
 		if (step === 1) {
@@ -151,10 +164,23 @@ function App() {
 				{step === 2 && (
 					<div className="space-y-8">
 						<div className="space-y-2">
-							<span className="text-xs tracking-[0.2em] text-muted-foreground">
-								步骤 02
-							</span>
-							<h2 className="text-2xl font-light">基本信息</h2>
+							<div className="flex items-center justify-between">
+								<div className="space-y-2">
+									<span className="text-xs tracking-[0.2em] text-muted-foreground">
+										步骤 02
+									</span>
+									<h2 className="text-2xl font-light">基本信息</h2>
+								</div>
+								{isDevelopment() && (
+									<button
+										type="button"
+										onClick={autoFillForm}
+										className="px-4 py-2 text-xs tracking-[0.15em] border border-border hover:bg-accent transition-colors"
+									>
+										自动填充
+									</button>
+								)}
+							</div>
 						</div>
 
 						<div className="space-y-6">
