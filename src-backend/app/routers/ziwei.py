@@ -69,7 +69,7 @@ def build_palace_analysis_prompt(
 {mutagen_info}
 
 ## 3. 古籍智慧 (RAG Context)
-{rag_context or 'No ancient texts found.'}
+{rag_context or '未检索到相关古籍。'}
 
 ## 4. 全局背景
 {context or 'No context provided'}
@@ -81,7 +81,8 @@ def build_palace_analysis_prompt(
 4.  **古今结合**: 将RAG提供的古籍在分析中使用，引用古籍时，必须完整引用，并结合语境进行解释，拒绝生搬硬套。
 5.  **语气基调**: 保持权威与克制，不要自称身份，不要寒暄。
 6.  **格式规范**: 使用Markdown输出。
-7.  **禁止寒暄**: 不要出现“你好”“我是”“大师”等自我介绍或问候语。
+7.  **引用要求**: 若提供了古籍内容，正文中必须至少引用 1 条原文，使用 Markdown 引用块 `>`；若古籍内容为空，必须明确写出“未检索到相关古籍”，不得编造。
+8.  **禁止寒暄**: 不要出现“你好”“我是”“大师”等自我介绍或问候语。
 
 IMPORTANT: Output the report in Chinese (Simplified).
 
@@ -93,6 +94,22 @@ IMPORTANT: Output the report in Chinese (Simplified).
 4.  **寻变数**: 寻找四化（禄、权、科、忌）。哪里有化忌的纠缠？哪里有化禄的机缘？这是吉凶的关键。
 5.  **下断语**: 综合所有信息，给出最终的性格/运势/建议判断。
 """
+
+
+def collect_star_names(palace: dict[str, Any]) -> list[str]:
+    names: list[str] = []
+    for key in ("majorStars", "minorStars", "adjectiveStars"):
+        for star in palace.get(key, []):
+            name = star.get("name")
+            if name:
+                names.append(name)
+    seen: set[str] = set()
+    unique_names: list[str] = []
+    for name in names:
+        if name not in seen:
+            seen.add(name)
+            unique_names.append(name)
+    return unique_names
 
 
 async def analyze_single_palace(
@@ -122,12 +139,16 @@ async def analyze_single_palace(
     mutagen_info = format_mutagen_info(palace)
 
     # Search for relevant ancient texts
-    query = f"紫微斗数 {palace_name} {major_stars} {minor_stars}"
+    star_names = collect_star_names(palace)
+    query_keywords = " ".join([palace_name, *star_names])
+    query = f"紫微斗数 {query_keywords}".strip()
     try:
         rag_context = ziwei_rag.search_context(query, max_results=3)
     except Exception as e:
         logger.error(f"RAG search failed for {palace_name}: {e}")
         rag_context = ""
+    if not rag_context:
+        logger.info(f"[Palace {palace_index}] RAG context empty for {palace_name}")
 
     # Build the prompt
     prompt = build_palace_analysis_prompt(

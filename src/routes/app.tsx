@@ -40,17 +40,22 @@ function AppMain() {
 	useEffect(() => {
 		return () => {
 			isActiveRef.current = false;
-			abortRef.current?.abort();
+			// Don't abort here - let in-flight request complete
+			// The isActiveRef check will prevent stale state updates
 		};
 	}, []);
 
 	useEffect(() => {
+		// Reset active flag on each effect run (needed for StrictMode remount)
+		isActiveRef.current = true;
+
 		const hasReports = palaceReports.length > 0;
 		console.log("[App] useEffect triggered", {
 			hasUserForm: !!userForm,
 			hasAstrolabe: !!astrolabe,
 			hasReports,
 			isLoading,
+			inFlight: inFlightRef.current,
 		});
 
 		// Skip if no data, already loading, or already have reports
@@ -64,9 +69,10 @@ function AppMain() {
 			return;
 		}
 
+		inFlightRef.current = true; // Set synchronously to prevent race condition
+
 		const fetchReports = async () => {
 			console.log("[App] Starting fetchReports...");
-			inFlightRef.current = true;
 			setIsLoading(true);
 			const controller = new AbortController();
 			abortRef.current?.abort();
@@ -88,18 +94,21 @@ function AppMain() {
 					controller.signal,
 				);
 				console.log("[App] API response:", response);
-				if (response.palaces) {
+				if (response.palaces && isActiveRef.current) {
 					console.log("[App] Setting palace reports:", response.palaces.length);
 					setPalaceReports(response.palaces);
 				}
+				// Only reset inFlightRef on successful completion
+				inFlightRef.current = false;
 			} catch (error) {
 				if (error instanceof DOMException && error.name === "AbortError") {
-					console.log("[App] Request aborted");
+					console.log("[App] Request aborted (keeping inFlightRef true)");
+					// Don't reset inFlightRef on abort - prevents duplicate request on StrictMode remount
 				} else {
 					console.error("[App] Failed to fetch palace reports:", error);
+					inFlightRef.current = false; // Reset on real errors
 				}
 			} finally {
-				inFlightRef.current = false;
 				if (isActiveRef.current) {
 					setIsLoading(false);
 				}

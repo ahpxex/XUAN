@@ -131,8 +131,8 @@ function App() {
 										: "border-border hover:border-muted-foreground"
 								}`}
 							>
-								占卜叫
-							</button>
+								如是观
+							</button>   
 							<button
 								type="button"
 								onClick={() => setFlowType("question")}
