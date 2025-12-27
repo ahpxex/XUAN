@@ -150,7 +150,7 @@ function AppMain() {
 
 	// 如果正在加载，只显示 LoadingOverlay
 	if (isLoading) {
-		return <LoadingOverlay isLoading={true} text="正在解析命盘" />;
+		return <LoadingOverlay isLoading={true} />;
 	}
 
 	return (

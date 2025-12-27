@@ -107,7 +107,7 @@ function App() {
 
 	// 如果正在导航，只显示 LoadingOverlay
 	if (isNavigating) {
-		return <LoadingOverlay isLoading={true} text="正在解析命盘" />;
+		return <LoadingOverlay isLoading={true} />;
 	}
 
 	return (

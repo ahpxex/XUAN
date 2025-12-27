@@ -11,7 +11,7 @@ function TestPage() {
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-8">
-			<LoadingOverlay isLoading={isLoading} text="正在解析命盘" />
+			<LoadingOverlay isLoading={isLoading} />
 
 			{/* 控制面板 */}
 			<div className="fixed top-8 left-8 z-[200] bg-black/80 backdrop-blur border border-white/20 p-6 rounded-lg">
@@ -29,9 +29,10 @@ function TestPage() {
 					</button>
 
 					<div className="text-white/60 text-sm space-y-2">
-						<p>• 150 star trails with breathing effect</p>
-						<p>• Center icon rotating (120s cycle)</p>
-						<p>• Independent opacity animations</p>
+						<p>• 150 star trails with rough texture</p>
+						<p>• Breathing opacity effect</p>
+						<p>• Center icon rotating (120s)</p>
+						<p>• Auto-switching mystical texts</p>
 					</div>
 				</div>
 			</div>
