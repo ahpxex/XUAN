@@ -28,3 +28,4 @@ def get_rag_service() -> RAGService:
         ingestion_service=get_ingestion_service(),
         llm_service=get_llm_service(),
     )
+

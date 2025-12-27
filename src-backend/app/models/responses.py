@@ -25,3 +25,10 @@ class HealthResponse(BaseModel):
     status: str
     qdrant_connected: bool
     llm_configured: bool
+
+
+class AstrolabeResponse(BaseModel):
+    """Response model for Ziwei astrolabe generation."""
+
+    astrolabe: dict
+    report: str | None = None

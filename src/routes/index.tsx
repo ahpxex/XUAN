@@ -1,5 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useSetAtom } from "jotai";
 import { useState } from "react";
+import type { BirthInfo } from "../atoms/ziwei";
+import { astrolabeAtom, birthInfoAtom } from "../atoms/ziwei";
+import { submitAstrolabe } from "../lib/api";
+import { buildAstrolabe } from "../lib/astrolabe";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -33,6 +38,8 @@ const YEARS = Array.from({ length: 100 }, (_, i) =>
 function App() {
 	const navigate = useNavigate();
 	const [step, setStep] = useState(1);
+	const setBirthInfo = useSetAtom(birthInfoAtom);
+	const setAstrolabe = useSetAtom(astrolabeAtom);
 	const [formData, setFormData] = useState<FormData>({
 		name: "",
 		gender: "",
@@ -61,6 +68,49 @@ function App() {
 	};
 
 	const totalSteps = 3;
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState("");
+
+	const handleComplete = async () => {
+		if (!canProceed() || isSubmitting) return;
+
+		const birthYear = Number.parseInt(formData.birthYear, 10);
+		const birthMonth = Number.parseInt(formData.birthMonth, 10);
+		const birthDay = Number.parseInt(formData.birthDay, 10);
+
+		if (
+			Number.isNaN(birthYear) ||
+			Number.isNaN(birthMonth) ||
+			Number.isNaN(birthDay)
+		) {
+			setSubmitError("请输入有效的日期。");
+			return;
+		}
+
+		const payload: BirthInfo = {
+			name: formData.name.trim() || undefined,
+			gender: formData.gender as "male" | "female",
+			birthYear,
+			birthMonth,
+			birthDay,
+			birthShichen: formData.birthShichen as BirthInfo["birthShichen"],
+			calendarType: "solar" as const,
+		};
+
+		try {
+			setIsSubmitting(true);
+			setSubmitError("");
+			const astrolabe = buildAstrolabe(payload);
+			await submitAstrolabe({ birthInfo: payload, astrolabe });
+			setBirthInfo(payload);
+			setAstrolabe(astrolabe);
+			navigate({ to: "/app" });
+		} catch (error) {
+			setSubmitError("生成星盘失败，请稍后再试。");
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
 
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -116,7 +166,6 @@ function App() {
 									{[
 										{ label: "男", value: "male" },
 										{ label: "女", value: "female" },
-										{ label: "其他", value: "other" },
 									].map((option) => (
 										<button
 											key={option.value}
@@ -226,17 +275,50 @@ function App() {
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 02
 							</span>
-							<h2 className="text-2xl font-light">内容待定</h2>
+							<h2 className="text-2xl font-light">确认信息</h2>
 							<p className="text-sm text-muted-foreground">
-								此步骤的内容将在后续开发中完善
+								请核对输入内容后继续
 							</p>
 						</div>
 
 						<div className="space-y-6">
-							<div className="border-2 border-dashed border-border p-12 text-center">
-								<p className="text-sm text-muted-foreground tracking-wide">
-									PLACEHOLDER
-								</p>
+							<div className="border-2 border-border p-6 space-y-3 text-sm">
+								<div className="flex justify-between">
+									<span className="text-muted-foreground tracking-[0.2em]">
+										姓名
+									</span>
+									<span>{formData.name || "未填写"}</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground tracking-[0.2em]">
+										性别
+									</span>
+									<span>
+										{formData.gender === "male"
+											? "男"
+											: formData.gender === "female"
+												? "女"
+												: "未选择"}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground tracking-[0.2em]">
+										日期
+									</span>
+									<span>
+										{formData.birthYear}-{formData.birthMonth}-{formData.birthDay}
+									</span>
+								</div>
+								<div className="flex justify-between">
+									<span className="text-muted-foreground tracking-[0.2em]">
+										时辰
+									</span>
+									<span>
+										{SHICHEN.find(
+											(item) => item.value === formData.birthShichen,
+										)?.label ?? "--"}
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -248,17 +330,15 @@ function App() {
 							<span className="text-xs tracking-[0.2em] text-muted-foreground">
 								步骤 03
 							</span>
-							<h2 className="text-2xl font-light">内容待定</h2>
+							<h2 className="text-2xl font-light">生成星盘</h2>
 							<p className="text-sm text-muted-foreground">
-								此步骤的内容将在后续开发中完善
+								确认后将开始排盘与解析
 							</p>
 						</div>
 
 						<div className="space-y-6">
-							<div className="border-2 border-dashed border-border p-12 text-center">
-								<p className="text-sm text-muted-foreground tracking-wide">
-									PLACEHOLDER
-								</p>
+							<div className="border-2 border-border p-6 text-sm text-muted-foreground tracking-wide">
+								系统将调用排盘服务生成你的紫微斗数命盘。
 							</div>
 						</div>
 					</div>
@@ -287,15 +367,24 @@ function App() {
 							if (step < totalSteps) {
 								setStep((s) => s + 1);
 							} else {
-								navigate({ to: "/app" });
+								handleComplete();
 							}
 						}}
-						disabled={!canProceed()}
+						disabled={!canProceed() || isSubmitting}
 						className="px-8 py-3 bg-foreground text-background text-sm tracking-wide hover:bg-foreground/90 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
-						{step === totalSteps ? "完成" : "继续"}
+						{step === totalSteps
+							? isSubmitting
+								? "生成中..."
+								: "完成"
+							: "继续"}
 					</button>
 				</div>
+				{submitError && (
+					<p className="mt-4 text-xs text-red-400 tracking-wide text-center">
+						{submitError}
+					</p>
+				)}
 			</footer>
 		</div>
 	);
