@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.core.dependencies import get_ingestion_service, get_llm_service
 from app.models.responses import HealthResponse
-from app.routers import ingest, query, ziwei
+from app.routers import divination, ingest, query, ziwei
 
 
 @asynccontextmanager
@@ -36,6 +36,7 @@ app.add_middleware(
 app.include_router(query.router)
 app.include_router(ingest.router)
 app.include_router(ziwei.router)
+app.include_router(divination.router)
 
 
 @app.get("/", response_model=HealthResponse)

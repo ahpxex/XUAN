@@ -17,10 +17,14 @@ class IngestionService:
     def get_qdrant_client(self) -> QdrantClient:
         """Get or create Qdrant client."""
         if self._qdrant_client is None:
-            self._qdrant_client = QdrantClient(
-                url=self.settings.qdrant_url,
-                api_key=self.settings.qdrant_api_key,
-            )
+            if self.settings.qdrant_url == "local":
+                # Use local persistence
+                self._qdrant_client = QdrantClient(path="./qdrant_data")
+            else:
+                self._qdrant_client = QdrantClient(
+                    url=self.settings.qdrant_url,
+                    api_key=self.settings.qdrant_api_key,
+                )
         return self._qdrant_client
 
     def get_vector_store(self) -> QdrantVectorStore:

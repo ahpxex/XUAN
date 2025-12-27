@@ -124,23 +124,21 @@ function App() {
 						<div className="flex gap-4">
 							<button
 								type="button"
-								onClick={() => setFlowType("divination")}
-								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${
-									flowType === "divination"
-										? "border-foreground bg-foreground text-background"
-										: "border-border hover:border-muted-foreground"
-								}`}
+								onClick={() => setFlowType("question")}
+								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${flowType === "question"
+									? "border-foreground bg-foreground text-background"
+									: "border-border hover:border-muted-foreground"
+									}`}
 							>
 								如是观
-							</button>   
+							</button>
 							<button
 								type="button"
-								onClick={() => setFlowType("question")}
-								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${
-									flowType === "question"
-										? "border-foreground bg-foreground text-background"
-										: "border-border hover:border-muted-foreground"
-								}`}
+								onClick={() => navigate({ to: "/divination" })}
+								className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${flowType === "divination"
+									? "border-foreground bg-foreground text-background"
+									: "border-border hover:border-muted-foreground"
+									}`}
 							>
 								每问事
 							</button>
@@ -185,11 +183,10 @@ function App() {
 											key={option.value}
 											type="button"
 											onClick={() => updateField("gender", option.value)}
-											className={`flex-1 py-3 border-2 text-sm tracking-wide transition-colors ${
-												formData.gender === option.value
-													? "border-foreground bg-foreground text-background"
-													: "border-border hover:border-muted-foreground"
-											}`}
+											className={`flex-1 py-3 border-2 text-sm tracking-wide transition-colors ${formData.gender === option.value
+												? "border-foreground bg-foreground text-background"
+												: "border-border hover:border-muted-foreground"
+												}`}
 										>
 											{option.label}
 										</button>
