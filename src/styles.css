@@ -152,4 +152,15 @@ code {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* 自定义 Typography 标题大小 - 让 h1、h2、h3、h4 使用相同大小 */
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    font-size: 1.5em;
+    line-height: 1.3333333;
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
 }
