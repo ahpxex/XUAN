@@ -15,6 +15,8 @@ dependencies = [
     "qdrant-client>=1.11.0",
     "sse-starlette>=2.1.0",
     "pydantic-settings>=2.5.0",
+    "najia>=2.0.1",
+    "arrow>=1.4.0",
 ]
 
 [project.optional-dependencies]

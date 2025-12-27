@@ -80,3 +80,16 @@ class AstrolabeSubmitRequest(BaseModel):
         description="Birth info used to generate the astrolabe",
     )
     astrolabe: dict = Field(..., description="Computed astrolabe payload")
+
+
+class MeiwenCastRequest(BaseModel):
+    """Request model for Meiwen divination."""
+
+    timestamp: str | None = Field(
+        default=None,
+        description="ISO timestamp used for casting (optional, defaults to now)",
+    )
+    question: str | None = Field(
+        default="",
+        description="Question or topic for the divination",
+    )

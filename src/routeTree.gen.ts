@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestRouteImport } from './routes/test'
+import { Route as MeiwenRouteImport } from './routes/meiwen'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TestRoute = TestRouteImport.update({
   id: '/test',
   path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeiwenRoute = MeiwenRouteImport.update({
+  id: '/meiwen',
+  path: '/meiwen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -32,30 +38,34 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
+  '/meiwen': typeof MeiwenRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
+  '/meiwen': typeof MeiwenRoute
   '/test': typeof TestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRoute
+  '/meiwen': typeof MeiwenRoute
   '/test': typeof TestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/test'
+  fullPaths: '/' | '/app' | '/meiwen' | '/test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/test'
-  id: '__root__' | '/' | '/app' | '/test'
+  to: '/' | '/app' | '/meiwen' | '/test'
+  id: '__root__' | '/' | '/app' | '/meiwen' | '/test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRoute
+  MeiwenRoute: typeof MeiwenRoute
   TestRoute: typeof TestRoute
 }
 
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/test'
       fullPath: '/test'
       preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meiwen': {
+      id: '/meiwen'
+      path: '/meiwen'
+      fullPath: '/meiwen'
+      preLoaderRoute: typeof MeiwenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRoute,
+  MeiwenRoute: MeiwenRoute,
   TestRoute: TestRoute,
 }
 export const routeTree = rootRouteImport

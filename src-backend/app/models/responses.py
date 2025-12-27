@@ -46,3 +46,21 @@ class PalaceAnalysisResponse(BaseModel):
     """Response model for palace analysis with 12 palace reports."""
 
     palaces: list[PalaceReport]
+
+
+class MeiwenAIAnalysis(BaseModel):
+    """AI analysis payload for Meiwen."""
+
+    question: str
+    response: str
+    is_mock: bool
+
+
+class MeiwenCastResponse(BaseModel):
+    """Response model for Meiwen divination."""
+
+    meta: dict
+    time_construct: dict
+    hexagram: dict
+    raw_najia: dict
+    ai_analysis: MeiwenAIAnalysis | None = None

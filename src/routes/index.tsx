@@ -91,6 +91,10 @@ function App() {
 
 	const handleContinue = () => {
 		if (step === 1) {
+			if (flowType === "question") {
+				navigate({ to: "/meiwen" });
+				return;
+			}
 			setStep(2);
 		} else if (step === 2) {
 			// Trigger loading and navigate
@@ -178,7 +182,7 @@ function App() {
 									type="button"
 									onClick={() => {
 										setFlowType("question");
-										setStep(2);
+										navigate({ to: "/meiwen" });
 									}}
 									className={`flex-1 py-12 border-2 text-lg tracking-wide transition-colors ${
 										flowType === "question"
