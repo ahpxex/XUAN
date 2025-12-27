@@ -20,12 +20,20 @@ export const Route = createFileRoute("/app")({
 	component: AppMain,
 });
 
+// Helper function to find the index of Life Palace (命宫)
+function findLifePalaceIndex(palaceReports: Array<{ name: string; index: number }>): number {
+	const lifePalace = palaceReports.find(
+		(report) => report.name === "命宫" || report.name === "命宮"
+	);
+	return lifePalace?.index ?? 0;
+}
+
 function AppMain() {
 	const userForm = useAtomValue(userFormAtom);
 	const [astrolabe, setAstrolabe] = useAtom(astrolabeAtom);
 	const [palaceReports, setPalaceReports] = useAtom(palaceReportsAtom);
 	const [isLoading, setIsLoading] = useAtom(isLoadingReportAtom);
-	const currentPalaceIndex = useAtomValue(currentPalaceIndexAtom);
+	const [currentPalaceIndex, setCurrentPalaceIndex] = useAtom(currentPalaceIndexAtom);
 	const [showReport, setShowReport] = useState(false);
 	const inFlightRef = useRef(false);
 	const abortRef = useRef<AbortController | null>(null);
@@ -45,6 +53,15 @@ function AppMain() {
 			// The isActiveRef check will prevent stale state updates
 		};
 	}, []);
+
+	// Set current palace to Life Palace when reports are loaded
+	useEffect(() => {
+		if (palaceReports.length > 0) {
+			const lifePalaceIndex = findLifePalaceIndex(palaceReports);
+			console.log("[App] Setting current palace to Life Palace, index:", lifePalaceIndex);
+			setCurrentPalaceIndex(lifePalaceIndex);
+		}
+	}, [palaceReports, setCurrentPalaceIndex]);
 
 	useEffect(() => {
 		// Reset active flag on each effect run (needed for StrictMode remount)
@@ -138,7 +155,7 @@ function AppMain() {
 			<PalaceStamp />
 
 			{/* Loading screen */}
-			{isLoading && <LoadingOverlay />}
+			<LoadingOverlay isLoading={isLoading} text="正在解析命盘" />
 
 			{/* Toggle button for report panel */}
 			{currentReport && !showReport && (

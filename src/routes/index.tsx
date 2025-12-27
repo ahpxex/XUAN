@@ -1,16 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import LoadingOverlay from "@/components/loading-overlay";
 import {
 	astrolabeAtom,
 	isLoadingReportAtom,
 	palaceReportsAtom,
-	userFormAtom,
 	type UserFormData,
+	userFormAtom,
 } from "../atoms/ziwei";
 import { generateAstrolabe } from "../lib/astrolabe";
 import { generateRandomUserData, isDevelopment } from "../lib/dev-utils";
-import { LoadingOverlay } from "../components/loading-overlay";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -39,7 +39,9 @@ function App() {
 	const setPalaceReports = useSetAtom(palaceReportsAtom);
 	const setIsLoading = useSetAtom(isLoadingReportAtom);
 	const [step, setStep] = useState(1);
-	const [flowType, setFlowType] = useState<"divination" | "question" | null>(null);
+	const [flowType, setFlowType] = useState<"divination" | "question" | null>(
+		null,
+	);
 	const [isNavigating, setIsNavigating] = useState(false);
 	const [formData, setFormData] = useState<UserFormData>({
 		name: "",
@@ -106,7 +108,7 @@ function App() {
 	return (
 		<div className="min-h-screen bg-background text-foreground flex flex-col">
 			{/* Loading Overlay */}
-			{isNavigating && <LoadingOverlay />}
+			<LoadingOverlay isLoading={isNavigating} text="正在解析命盘" />
 
 			{/* Header */}
 			<header className="border-b border-border p-6">
@@ -149,7 +151,7 @@ function App() {
 								}`}
 							>
 								如是观
-							</button>   
+							</button>
 							<button
 								type="button"
 								onClick={() => setFlowType("question")}
@@ -240,7 +242,9 @@ function App() {
 											<input
 												type="text"
 												value={formData.birthMonth}
-												onChange={(e) => updateField("birthMonth", e.target.value)}
+												onChange={(e) =>
+													updateField("birthMonth", e.target.value)
+												}
 												placeholder="03"
 												maxLength={2}
 												className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm transition-colors placeholder:text-muted-foreground/50"
@@ -253,7 +257,9 @@ function App() {
 											<input
 												type="text"
 												value={formData.birthDay}
-												onChange={(e) => updateField("birthDay", e.target.value)}
+												onChange={(e) =>
+													updateField("birthDay", e.target.value)
+												}
 												placeholder="15"
 												maxLength={2}
 												className="w-full bg-transparent border-2 border-border focus:border-foreground outline-none p-3 text-sm transition-colors placeholder:text-muted-foreground/50"
