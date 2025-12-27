@@ -25,7 +25,10 @@ export const astrolabeAtom = atom<FunctionalAstrolabe | null>(null);
 export const aiReportAtom = atom<string | null>(null);
 
 // Store palace reports from backend (detailed 12 palace analysis)
-export const palaceReportsAtom = atom<PalaceReport[]>([]);
+export const palaceReportsAtom = atomWithStorage<PalaceReport[]>(
+	"xuan-palace-reports",
+	[],
+);
 
 // Loading state for API calls
 export const isLoadingReportAtom = atom(false);

@@ -4,11 +4,12 @@ Provides endpoints for astrolabe analysis with detailed palace reports.
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from llama_index.core.llms import ChatMessage
 
 from app.core.dependencies import get_llm_service, get_ziwei_rag_service
@@ -147,6 +148,9 @@ async def analyze_single_palace(
         response = await llm.achat(messages)
         analysis = response.message.content or "Analysis generation failed."
         logger.info(f"[Palace {palace_index}] LLM response received, length: {len(analysis)}")
+    except asyncio.CancelledError:
+        logger.info(f"[Palace {palace_index}] Cancelled for {palace_name}")
+        raise
     except Exception as e:
         logger.error(f"[Palace {palace_index}] LLM analysis failed for {palace_name}: {e}")
         analysis = f"Unable to generate analysis for {palace_name}: {str(e)}"
@@ -156,6 +160,19 @@ async def analyze_single_palace(
         index=palace_index,
         analysis=analysis,
     )
+
+
+async def cancel_on_disconnect(
+    request: Request,
+    tasks: list[asyncio.Task[PalaceReport]],
+) -> None:
+    while True:
+        if await request.is_disconnected():
+            logger.info("[analyze-palaces] Client disconnected, cancelling tasks")
+            for task in tasks:
+                task.cancel()
+            return
+        await asyncio.sleep(0.25)
 
 
 @router.post("/astrolabe", response_model=AstrolabeResponse)
@@ -193,7 +210,8 @@ Astrolabe Data:
 
 @router.post("/analyze-palaces", response_model=PalaceAnalysisResponse)
 async def analyze_palaces(
-    request: AstrolabeSubmitRequest,
+    payload: AstrolabeSubmitRequest,
+    request: Request,
     llm_service: LLMService = Depends(get_llm_service),
     ziwei_rag: ZiweiRAGService = Depends(get_ziwei_rag_service),
 ):
@@ -207,8 +225,8 @@ async def analyze_palaces(
     - Ancient texts context via RAG
     """
     logger.info("[analyze-palaces] Request received")
-    birth_info = request.birth_info
-    astrolabe = request.astrolabe
+    birth_info = payload.birth_info
+    astrolabe = payload.astrolabe
 
     # Extract palaces from astrolabe
     palaces = astrolabe.get("palaces", [])
@@ -224,18 +242,29 @@ Birth Time: {birth_info.birth_shichen}"""
 
     # Analyze all palaces in parallel
     tasks = [
-        analyze_single_palace(
-            palace=palace,
-            palace_index=idx,
-            all_palaces=palaces,
-            context=context,
-            llm_service=llm_service,
-            ziwei_rag=ziwei_rag,
+        asyncio.create_task(
+            analyze_single_palace(
+                palace=palace,
+                palace_index=idx,
+                all_palaces=palaces,
+                context=context,
+                llm_service=llm_service,
+                ziwei_rag=ziwei_rag,
+            )
         )
         for idx, palace in enumerate(palaces)
     ]
+    disconnect_task = asyncio.create_task(cancel_on_disconnect(request, tasks))
 
-    palace_reports = await asyncio.gather(*tasks)
+    try:
+        palace_reports = await asyncio.gather(*tasks)
+    except asyncio.CancelledError:
+        logger.info("[analyze-palaces] Cancelled due to client disconnect")
+        raise HTTPException(status_code=499, detail="Client closed request")
+    finally:
+        disconnect_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await disconnect_task
 
     logger.info(f"[analyze-palaces] Completed, returning {len(palace_reports)} reports")
     return PalaceAnalysisResponse(palaces=list(palace_reports))
