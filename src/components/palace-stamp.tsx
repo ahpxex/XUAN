@@ -12,6 +12,13 @@ export function PalaceStamp() {
 	const palaceName = useAtomValue(currentPalaceNameAtom);
 	const stars = useAtomValue(currentPalaceStarsAtom);
 	const direction = useAtomValue(palaceSwitchDirectionAtom);
+	const trimmedName = palaceName.trim();
+	const isLifePalace = trimmedName === "命宫" || trimmedName === "命宮";
+	const hasSuffix = trimmedName.endsWith("宫") || trimmedName.endsWith("宮");
+	const displayName =
+		trimmedName && trimmedName !== "未知" && !isLifePalace && !hasSuffix
+			? `${trimmedName}宫`
+			: trimmedName;
 
 	// 动画变体
 	const variants = {
@@ -46,7 +53,7 @@ export function PalaceStamp() {
 						opacity: { duration: 0.2 },
 					}}
 				>
-					{palaceName.split("").map((char, index) => (
+					{displayName.split("").map((char, index) => (
 						<span
 							key={index}
 							className="text-white text-6xl font-bold"

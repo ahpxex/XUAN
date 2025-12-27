@@ -1,6 +1,6 @@
 import { atom } from "jotai";
-import { astrolabeAtom, palaceReportsAtom } from "./ziwei";
 import { STAR_DESCRIPTIONS } from "../lib/star-descriptions";
+import { astrolabeAtom, palaceReportsAtom } from "./ziwei";
 
 export interface Star {
 	name: string;
@@ -55,20 +55,12 @@ export const currentPalaceNameAtom = atom((get) => {
 export const currentPalaceStarsAtom = atom((get) => {
 	const currentIndex = get(currentPalaceIndexAtom);
 	const astrolabe = get(astrolabeAtom);
-	const palaceReports = get(palaceReportsAtom);
 
 	if (!astrolabe || !astrolabe.palaces) {
 		return [];
 	}
 
-	// 从 palaceReports 中获取当前宫位的名称
-	const currentReport = palaceReports.find((r) => r.index === currentIndex);
-	if (!currentReport) {
-		return [];
-	}
-
-	// 通过宫位名称在 astrolabe 中查找对应的宫位
-	const palace = astrolabe.palaces.find((p) => p.name === currentReport.name);
+	const palace = astrolabe.palaces[currentIndex];
 	if (!palace) {
 		return [];
 	}

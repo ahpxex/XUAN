@@ -54,6 +54,12 @@ function AppMain() {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (!astrolabe && userForm) {
+			setAstrolabe(generateAstrolabe(userForm));
+		}
+	}, [astrolabe, setAstrolabe, userForm]);
+
 	// Set current palace to Life Palace when reports are loaded
 	useEffect(() => {
 		if (palaceReports.length > 0) {

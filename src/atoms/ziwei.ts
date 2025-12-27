@@ -1,6 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import type { FunctionalAstrolabe } from "iztro/lib/astro/FunctionalAstrolabe";
+import type { Astrolabe } from "../lib/iztro-types";
 import type { PalaceReport } from "../lib/api";
 
 export interface UserFormData {
@@ -18,8 +18,8 @@ export const userFormAtom = atomWithStorage<UserFormData | null>(
 	null,
 );
 
-// Store computed astrolabe from iztro (not persisted - regenerated from form data)
-export const astrolabeAtom = atom<FunctionalAstrolabe | null>(null);
+// Store computed Astrolabe (not persisted - regenerated from form data)
+export const astrolabeAtom = atom<Astrolabe | null>(null);
 
 // Store AI report from backend (simple overview)
 export const aiReportAtom = atom<string | null>(null);

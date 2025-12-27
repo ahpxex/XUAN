@@ -1,5 +1,5 @@
 import { astro } from "iztro";
-import type { FunctionalAstrolabe } from "iztro/lib/astro/FunctionalAstrolabe";
+import type { Astrolabe } from "./iztro-types";
 import type { UserFormData } from "../atoms/ziwei";
 
 // Map shichen value to index (0-11)
@@ -19,11 +19,11 @@ const SHICHEN_INDEX: Record<string, number> = {
 };
 
 /**
- * Generate astrolabe from user form data using iztro
+ * Generate Astrolabe from user form data using iztro
  */
 export function generateAstrolabe(
 	formData: UserFormData,
-): FunctionalAstrolabe {
+): Astrolabe {
 	const dateStr = `${formData.birthYear}-${formData.birthMonth}-${formData.birthDay}`;
 	const timeIndex = SHICHEN_INDEX[formData.birthShichen] ?? 0;
 	const gender = formData.gender === "male" ? "男" : "女";
@@ -32,8 +32,8 @@ export function generateAstrolabe(
 }
 
 /**
- * Convert astrolabe to a plain object for API submission
+ * Convert Astrolabe to a plain object for API submission
  */
-export function astrolabeToJSON(astrolabe: FunctionalAstrolabe): object {
+export function astrolabeToJSON(astrolabe: Astrolabe): object {
 	return JSON.parse(JSON.stringify(astrolabe));
 }
