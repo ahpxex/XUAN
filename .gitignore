@@ -33,3 +33,4 @@ htmlcov/
 .nox/
 .hypothesis/
 .ipynb_checkpoints/
+ref
