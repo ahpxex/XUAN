@@ -90,11 +90,11 @@ export function CustomSelect({
 				<AnimatePresence>
 					{isOpen && (
 						<motion.div
-							initial={{ opacity: 0, y: -10 }}
+							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
+							exit={{ opacity: 0, y: 10 }}
 							transition={{ duration: 0.15 }}
-							className="absolute z-50 w-full mt-1 bg-background border-2 border-foreground max-h-64 overflow-y-auto"
+							className="absolute z-50 w-full bottom-full mb-1 bg-background border-2 border-foreground max-h-64 overflow-y-auto"
 						>
 							{options.map((option) => (
 								<motion.button
