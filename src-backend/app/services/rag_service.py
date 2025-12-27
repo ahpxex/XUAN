@@ -1,3 +1,4 @@
+import logging
 from collections.abc import AsyncGenerator
 
 from llama_index.core import VectorStoreIndex
@@ -6,6 +7,8 @@ from llama_index.core.llms import ChatMessage
 from app.config import Settings
 from app.services.ingestion_service import IngestionService
 from app.services.llm_service import LLMService
+
+logger = logging.getLogger(__name__)
 
 
 class RAGService:
@@ -61,8 +64,17 @@ class RAGService:
         retriever = index.as_retriever(similarity_top_k=top_k)
         nodes = retriever.retrieve(prompt)
 
+        logger.info(f"RAG Retrieved {len(nodes)} nodes for query: {prompt}")
+        for i, node in enumerate(nodes):
+            score = node.score if hasattr(node, "score") else "N/A"
+            source = node.metadata.get("file_name", "unknown")
+            logger.info(f"Node {i+1} [score: {score}, source: {source}]:")
+            logger.info(f"Content: {node.get_content()[:200]}...")
+
         retrieved_context = "\n\n".join([node.get_content() for node in nodes])
         sources = [node.metadata.get("file_name", "unknown") for node in nodes]
+
+        logger.info(f"Total retrieved context length: {len(retrieved_context)} characters")
 
         final_prompt = self.build_prompt_with_context(
             prompt, user_context, retrieved_context
@@ -92,7 +104,16 @@ class RAGService:
         retriever = index.as_retriever(similarity_top_k=top_k)
         nodes = retriever.retrieve(prompt)
 
+        logger.info(f"RAG Stream Retrieved {len(nodes)} nodes for query: {prompt}")
+        for i, node in enumerate(nodes):
+            score = node.score if hasattr(node, "score") else "N/A"
+            source = node.metadata.get("file_name", "unknown")
+            logger.info(f"Node {i+1} [score: {score}, source: {source}]:")
+            logger.info(f"Content: {node.get_content()[:200]}...")
+
         retrieved_context = "\n\n".join([node.get_content() for node in nodes])
+
+        logger.info(f"Total retrieved context length: {len(retrieved_context)} characters")
 
         final_prompt = self.build_prompt_with_context(
             prompt, user_context, retrieved_context

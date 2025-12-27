@@ -29,12 +29,12 @@ class LLMService:
         return self._llm
 
     def get_embed_model(self) -> OpenAIEmbedding:
-        """Get or create the embedding model instance (uses same provider as LLM)."""
+        """Get or create the embedding model instance (can use separate provider)."""
         if self._embed_model is None:
             self._embed_model = OpenAIEmbedding(
                 model_name=self.settings.embedding_model_name,
-                api_base=self.settings.llm_api_base,
-                api_key=self.settings.llm_api_key,
+                api_base=self.settings.embedding_api_base or self.settings.llm_api_base,
+                api_key=self.settings.embedding_api_key or self.settings.llm_api_key,
             )
         return self._embed_model
 

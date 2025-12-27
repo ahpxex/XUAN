@@ -37,7 +37,9 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 2048
     llm_temperature: float = 0.7
 
-    # Embedding (uses same API base and key as LLM)
+    # Embedding (can use separate API base and key)
+    embedding_api_base: str | None = None
+    embedding_api_key: str | None = None
     embedding_model_name: str = "text-embedding-3-small"
 
     # Ingestion

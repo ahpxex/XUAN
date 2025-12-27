@@ -77,6 +77,7 @@ class ZiweiRAGService:
 
         # Extract keywords from query
         keywords = [k.strip() for k in query.replace("紫微斗数", "").split() if k.strip()]
+        logger.info(f"Ziwei RAG searching for keywords: {keywords}")
 
         # Score each node by keyword matches
         scored_nodes = []
@@ -93,9 +94,20 @@ class ZiweiRAGService:
         scored_nodes.sort(key=lambda x: x[0], reverse=True)
         top_nodes = scored_nodes[:max_results]
 
+        logger.info(f"Ziwei RAG found {len(scored_nodes)} matching nodes, returning top {len(top_nodes)}")
+
+        for i, (score, node) in enumerate(top_nodes):
+            logger.info(f"Ziwei Node {i+1} [score: {score}, title: {node['title']}]:")
+            logger.info(f"Content: {node['text'][:200]}...")
+
         if not top_nodes:
+            logger.warning("No matching nodes found for query")
             return ""
 
         # Format results
         texts = [f"### {node['title']}\n{node['text']}" for _, node in top_nodes]
-        return "\n\n".join(texts)
+        result = "\n\n".join(texts)
+
+        logger.info(f"Total Ziwei retrieved context length: {len(result)} characters")
+
+        return result
