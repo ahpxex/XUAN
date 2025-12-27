@@ -79,6 +79,7 @@ export async function submitAstrolabe(
 export async function analyzePalaces(
 	birthInfo: BirthInfo,
 	astrolabe: object,
+	signal?: AbortSignal,
 ): Promise<PalaceAnalysisResponse> {
 	const url = `${API_BASE}/ziwei/analyze-palaces`;
 	console.log("[API] analyzePalaces called", { url, birthInfo });
@@ -88,6 +89,7 @@ export async function analyzePalaces(
 		headers: {
 			"Content-Type": "application/json",
 		},
+		signal,
 		body: JSON.stringify({
 			birthInfo,
 			astrolabe,

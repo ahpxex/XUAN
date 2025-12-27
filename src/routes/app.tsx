@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
 	astrolabeAtom,
@@ -26,6 +26,9 @@ function AppMain() {
 	const [isLoading, setIsLoading] = useAtom(isLoadingReportAtom);
 	const currentPalaceIndex = useAtomValue(currentPalaceIndexAtom);
 	const [showReport, setShowReport] = useState(false);
+	const inFlightRef = useRef(false);
+	const abortRef = useRef<AbortController | null>(null);
+	const isActiveRef = useRef(true);
 
 	console.log("[App] Component rendered", {
 		hasUserForm: !!userForm,
@@ -33,6 +36,13 @@ function AppMain() {
 		palaceReportsCount: palaceReports.length,
 		isLoading,
 	});
+
+	useEffect(() => {
+		return () => {
+			isActiveRef.current = false;
+			abortRef.current?.abort();
+		};
+	}, []);
 
 	useEffect(() => {
 		const hasReports = palaceReports.length > 0;
@@ -44,18 +54,23 @@ function AppMain() {
 		});
 
 		// Skip if no data, already loading, or already have reports
-		if (!userForm || isLoading || hasReports) {
+		if (!userForm || isLoading || hasReports || inFlightRef.current) {
 			console.log("[App] Skipping API call - conditions not met", {
 				noUserForm: !userForm,
 				isLoading,
 				hasReports,
+				inFlight: inFlightRef.current,
 			});
 			return;
 		}
 
 		const fetchReports = async () => {
 			console.log("[App] Starting fetchReports...");
+			inFlightRef.current = true;
 			setIsLoading(true);
+			const controller = new AbortController();
+			abortRef.current?.abort();
+			abortRef.current = controller;
 			try {
 				const resolvedAstrolabe =
 					astrolabe ?? generateAstrolabe(userForm);
@@ -67,16 +82,27 @@ function AppMain() {
 				const astrolabeData = astrolabeToJSON(resolvedAstrolabe);
 				console.log("[App] Astrolabe data (keys):", Object.keys(astrolabeData));
 				console.log("[App] Calling analyzePalaces API...");
-				const response = await analyzePalaces(birthInfo, astrolabeData);
+				const response = await analyzePalaces(
+					birthInfo,
+					astrolabeData,
+					controller.signal,
+				);
 				console.log("[App] API response:", response);
 				if (response.palaces) {
 					console.log("[App] Setting palace reports:", response.palaces.length);
 					setPalaceReports(response.palaces);
 				}
 			} catch (error) {
-				console.error("[App] Failed to fetch palace reports:", error);
+				if (error instanceof DOMException && error.name === "AbortError") {
+					console.log("[App] Request aborted");
+				} else {
+					console.error("[App] Failed to fetch palace reports:", error);
+				}
 			} finally {
-				setIsLoading(false);
+				inFlightRef.current = false;
+				if (isActiveRef.current) {
+					setIsLoading(false);
+				}
 			}
 		};
 
@@ -85,7 +111,6 @@ function AppMain() {
 		userForm,
 		astrolabe,
 		palaceReports.length,
-		isLoading,
 		setAstrolabe,
 		setPalaceReports,
 		setIsLoading,
